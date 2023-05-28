@@ -1,0 +1,112 @@
+<html>
+<head>
+<title>Poker</title>
+  <link rel="stylesheet" href="_poker_ui.css">
+
+<!--
+  Mat4 class
+  -->
+<script src="mat4.js" type="text/javascript"></script>
+
+<!--
+  Vertex shader
+  -->
+<script id="shader-vs" type="x-shader/x-vertex"> 
+   precision highp float;
+   attribute vec3 XYZ;
+   attribute vec3 NORM;
+   attribute vec3 RGB;
+   attribute vec2 T2D;
+   uniform mat4 ProjectionMatrix;
+   uniform mat4 ViewMatrix;
+   uniform mat4 ModelviewMatrix;
+   uniform mat3 NormalMatrix;
+   varying vec3 col;
+   varying vec2 t2d;
+   const vec4 Global = vec4(0.1,0.1,0.1,1.0);
+   const vec4 Ambient = vec4(0.3,0.3,0.3,1.0);
+   const vec4 Diffuse  = vec4(0.8,0.8,0.8,1.0);
+   const vec4 Specular = vec4(1.0,1.0,1.0,1.0);
+   uniform vec4 Position;
+   const float fov = 57.0;
+   vec4 phong()
+   {
+      //  P is the vertex coordinate on body
+      vec3 P = vec3(ModelviewMatrix * vec4(XYZ,1.0));
+      //  N is the object normal at P
+      vec3 N = normalize(NormalMatrix * NORM);
+      //  L is the light vector
+      vec3 L = normalize(vec3(ViewMatrix*Position) - P);
+      //  Emission and ambient color
+      vec4 color = (Global+Ambient)*vec4(RGB,1.0);
+      //  Diffuse light intensity is cosine of light and normal vectors
+      float Id = dot(L,N);
+      if (Id>0.0)
+      {
+         //  Add diffuse - material color from Color
+         color += Id*Diffuse*vec4(RGB,1.0);
+         //  R is the reflected light vector R = 2(L.N)N - L
+         vec3 R = reflect(-L, N);
+         //  V is the view vector (eye at the origin)
+         vec3 V = (fov>0.0) ? normalize(-P) : vec3(0,0,1);
+         //  Specular is cosine of reflected and view vectors
+         //  Assert material specular color is white
+         float Is = dot(R,V);
+         if (Is>0.0) color += pow(Is,8.0)*Specular;
+      }
+      //  Return sum of color components
+      return color;
+   }
+   void main(void)
+   {
+      col = phong().rgb;
+      t2d = T2D;
+      gl_Position = ProjectionMatrix * ModelviewMatrix * vec4(XYZ,1);
+   }
+</script> 
+ 
+<!--
+  Fragment shader
+  -->
+<script id="shader-fs" type="x-shader/x-fragment"> 
+   precision highp float;
+   varying vec3 col;
+   varying vec2 t2d;
+   uniform sampler2D tex;
+   void main(void)
+   {
+      gl_FragColor = vec4(col,1)*texture2D(tex,t2d);
+   }
+</script> 
+
+<!--
+  WebGL program
+  -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="webgl.js"></script>
+  <script type="module">
+     import {pokerlogic} from './pokerlogic.js';
+     __main__(pokerlogic())
+  </script>
+
+
+<!--
+  Web page
+  -->
+</head>
+
+<body onresize="canvas.resize();">
+   <div class="main-wrapper">
+      <canvas class="" id="canvas" width="500" height="500"></canvas>
+      <div class="ui-wrapper">
+         <img src="logo.jpg" width="150" height="auto">
+         <button id="step-button" class="green-button">STEP</button>
+         <button id="reset-button" class="green-button">RESET</button>
+         <button id="check-flop-button" class="green-button">CHECK FLOP</button>
+         <button id="peek-cards-button" class="green-button">PEEK</button>
+      </div>
+</div>
+ 
+
+</body>
+</html>

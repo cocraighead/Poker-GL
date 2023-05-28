@@ -1,0 +1,27 @@
+.main-wrapper{
+    display: flex;
+    background-color: black;
+}
+
+.ui-wrapper{
+    width: 200px;
+    display:flex;
+    flex-direction: column;
+    background-color: rgb(213, 213, 213);
+}
+
+.green-button{
+    background-color: green;
+    border: 1px solid black;
+    width: 60%;
+    margin: 24px;
+    height: 20px;
+}
+
+.green-button:hover{
+    background-color: rgb(60, 179, 60);
+    border: 1px solid rgb(227, 220, 88)ca;
+    width: 60%;
+    margin: 24px;
+    height: 20px;
+}

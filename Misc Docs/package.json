@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "xhr2": "^0.2.1"
+  }
+}
