@@ -43,17 +43,17 @@ function actionFn(data){
         }
     }
 
-    var faces = []
+    var verts = []
 
     facesLines.forEach(line => {
         var sArr = line.split(' ')
-        sArr.forEach(triangle => faces.push(triangle))
+        sArr.forEach(vert => verts.push(vert))
     });
 
     var bufferLines = []
 
-    faces.forEach(face => {
-        var arr = face.split('/')
+    verts.forEach(vert => {
+        var arr = vert.split('/')
         var pointIndex = arr[0]-1
         var textIndex = arr[1]-1
         var normIndex = arr[2]-1
@@ -70,4 +70,4 @@ function actionFn(data){
 
 }
 
-readTextFile('C:\\Users\\Zed God\\Documents\\Code Docs\\Poker GL\\Misc Docs\\bent_card.obj')
+readTextFile('C:\\Users\\Zed God\\Documents\\Code Docs\\Poker GL\\Misc Docs\\bentcard.obj')
