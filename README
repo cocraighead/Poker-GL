@@ -10,3 +10,30 @@ Created the beginings of a wooden record player in webGl.
 
 *  Key bindings:
  *  Drag mouse to rotate scene
+
+
+ TODO:
+ -- get better a blender...
+
+ Organize code - Try to create so classes 
+ Comment code
+ Fix animation cycle
+ viewing tools
+ Finish bent card
+ Create more card textures
+ Draw card with it's correct texture
+ Make ui look good
+ Define bet and turn rules
+ Fill out UI for all needed moves
+ Draw chips - differnt pile sizes
+ Define poker rules
+ Implement rules
+ Create scene and poker table
+ Create characters to rep players
+ Create express server.js
+ new game screen on front end - setup game in backend
+ queue player moves in server
+ send player moves to server
+ get new player moves from server
+ have server drive front end stepping through game
+ ...
