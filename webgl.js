@@ -1,23 +1,33 @@
 var uiObject
 
+var imagesFolder = 'textures/'
+var suites = ['c']
+var cardNumbersStart = '2'
+var cardNumbersEnd = '14'
+
 function __main__(ui){
     uiObject = ui 
-    var imagesFolder = 'textures/'
+    
     var imagesArr = [
       imagesFolder+'wood.jpg',
       imagesFolder+'card_backs.jpg',
       imagesFolder+'double_card_back.png'
    ]
-   for(var cardi=2;cardi<15;cardi++){
-      imagesArr.push(imagesFolder+'card_c'+cardi+'.png')
+
+   for(var suitei=0;suitei<suites.length;suitei++){
+      for(var cardi=Number(cardNumbersStart);cardi<=Number(cardNumbersEnd);cardi++){
+         imagesArr.push(imagesFolder+'card_'+suites[suitei]+cardi+'.png')
+      }
    }
+   
     loadImages(imagesArr, webGLStart)
 }
 
-function loadImages(urls, callback) {
+function loadImages(urls, webGLStart) {
     function loadImage(url, callback) {
         var image = new Image();
         image.src = url;
+        image.id = url;
         image.onload = callback;
         return image;
       }
@@ -30,7 +40,7 @@ function loadImages(urls, callback) {
       --imagesToLoad;
       // If all the images are loaded call the callback.
       if (imagesToLoad == 0) {
-        callback(images);
+         webGLStart(images);
       }
     };
    
@@ -660,6 +670,7 @@ function webGLStart(images)
    
    // Create and load textures
    var textures = []
+   var texturesDict = {}
    for(let i_img=0;i_img<images.length;i_img++){
         var tex = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,tex);
@@ -667,6 +678,7 @@ function webGLStart(images)
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
         textures.push(tex)
+        texturesDict[images[i_img].id] = {tex: tex}
    }
    
    // animation vars
@@ -810,8 +822,8 @@ function webGLStart(images)
                   drawPeakingCard(false,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures)
                   // drawPeakingCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures)
                }else{
-                  drawCard(false,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures)
-                  drawCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures)
+                  drawCard(false,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures,texturesDict,'c','14')
+                  drawCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures,texturesDict,'c','14')
                }
             })
         }
@@ -833,7 +845,7 @@ function webGLStart(images)
             drawFlippingCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures,now-flopFlipStartTime,true)
             drawFlippingCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures,now-flopFlipStartTime,true)
          }else if(flopHasFlipped){
-            drawFlop(xs,ModelviewMatrix,textures)
+            drawFlop(xs,ModelviewMatrix,textures,texturesDict,'c','13')
          }
       }
       if(uiObject.stepClicks > 2){
@@ -851,7 +863,7 @@ function webGLStart(images)
             }
             drawFlippingCard(true,xs,-.3,0,0,ModelviewMatrix,textures,now-turnFlipStartTime,false)
          }else if(turnHasFlipped){
-           drawCard(true,xs,0,0,0,ModelviewMatrix,textures)
+           drawCard(true,xs,0,0,0,ModelviewMatrix,textures,texturesDict,'c','14')
          }
       }
       if(uiObject.stepClicks > 3){
@@ -869,7 +881,7 @@ function webGLStart(images)
             }
             drawFlippingCard(true,xs,-.3,0,0,ModelviewMatrix,textures,now-riverFlipStartTime,false)
          }else if(riverHasFlipped){
-            drawCard(true,xs,0,0,0,ModelviewMatrix,textures)
+            drawCard(true,xs,0,0,0,ModelviewMatrix,textures,texturesDict,'c','14')
          }
       }
       
@@ -914,6 +926,16 @@ function webGLStart(images)
     gl.disableVertexAttribArray(NORM);
     gl.disableVertexAttribArray(RGB);
     gl.disableVertexAttribArray(T2D);
+}
+
+function getCardTexture(faceUp, suite, cardNumber, texturesDict){
+   if(!faceUp){
+      var texObject = texturesDict[imagesFolder+'double_card_back.png']
+      return texObject ? texObject.tex : {}
+   }
+
+   var texObject = texturesDict[imagesFolder+'card_'+suite+cardNumber+'.png']
+   return texObject ? texObject.tex : {}
 }
 
 function drawFlippingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,now,horizontal){
@@ -993,9 +1015,9 @@ function drawMovingCard(faceUp,spinning,endYAngle,ySit,x1,z1,x2,z2,ModelviewMatr
     gl.disableVertexAttribArray(T2D);
 } 
 
-   function drawCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures){
+   function drawCard(faceUp,x,z,ySit,rotation,ModelviewMatrix, textures, texturesDict, suite, cardNumber){
     
-    gl.bindTexture(gl.TEXTURE_2D,faceUp?textures[15]:textures[2])
+    gl.bindTexture(gl.TEXTURE_2D,getCardTexture(faceUp,suite,cardNumber,texturesDict))
     //  Bind cube buffer
     gl.bindBuffer(gl.ARRAY_BUFFER,card);
     //  Set up 3D vertex array
@@ -1150,10 +1172,10 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures){
       drawMovingCard(false,false,0,0,-.9,0,xs.c,0,ModelviewMatrix,textures[1],now)
    }
 
-   function drawFlop(xs,ModelviewMatrix,textures){
-      drawCard(true,xs.a+.3,0,0,0,ModelviewMatrix,textures)
-      drawCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures)
-      drawCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures)         
+   function drawFlop(xs,ModelviewMatrix,textures,texturesDict,suite,cardNumber){
+      drawCard(true,xs.a+.3,0,0,0,ModelviewMatrix,textures,texturesDict,suite,cardNumber)
+      drawCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures,texturesDict,suite,cardNumber)
+      drawCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures,texturesDict,suite,cardNumber)         
    }
 
    function getPlayersPos(numPlayers){
