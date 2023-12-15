@@ -686,29 +686,20 @@ function webGLStart(images)
    var zh = 0;
    var LightPosition = [3.5*Math.cos(zh),2,3.5*Math.sin(zh),1.0];
    // single set vars
-   var dealing = false
-   var hasDelt = false
-   var deltStartTime = -1
-   var floppping = false
-   var hasFloped = false
-   var flopStartTime = -1
-   var flopFlipping = false
-   var flopHasFlipped = false
-   var flopFlipStartTime = -1
-   var turning = false
-   var hasTurned = false
-   var turnStartTime = -1
-   var turnFlipping = false
-   var turnHasFlipped = false
-   var turnFlipStartTime = -1
-   var rivering = false
-   var hasRivered = false
-   var riverStartTime = -1
-   var riverFlipping = false
-   var riverHasFlipped = false
-   var riverFlipStartTime = -1
+   
+   var animationState = 0 // 0=rest , 1=deal , 2=flopping, 3=turning, 4=rivering
+   var previousAnimationState = 0
+   var dealAnimationData = getNewAnimationData('deal')
+   var flopAnimationData = getNewAnimationData('flop')
+   var flippingFlopAnimationData = getNewAnimationData('flipping_flop')
+   var turnAnimationData = getNewAnimationData('turn')
+   var flippingTurnAnimationData = getNewAnimationData('flipping_turn')
+   var riverAnimationData = getNewAnimationData('river')
+   var flippingRiverAnimationData = getNewAnimationData('flipping_river')
+
    var globalPlayersNumber = 9
    var playingAs = 2
+   
    //  Draw scene the first time
    requestAnimationFrame(Display);
    //
@@ -755,66 +746,27 @@ function webGLStart(images)
       drawTable(ModelviewMatrix,textures[0]);
       drawDeck(0,0,.5,ModelviewMatrix,textures[1]); 
 
-
+      // animations logic
       if(uiObject.stepClicks === 1){
-        if(deltStartTime === -1){
-            deltStartTime = now
-            dealing = true
-        } 
+         triggerAnimationStart(dealAnimationData, now)
       }
       if(uiObject.stepClicks === 2){
-         if(flopStartTime === -1){
-             flopStartTime = now
-             floppping = true
-         } 
+         triggerAnimationStart(flopAnimationData, now)
       }
       if(uiObject.stepClicks === 3){
-         if(turnStartTime === -1){
-             turnStartTime = now
-             turning = true
-         } 
+         triggerAnimationStart(turnAnimationData,now)
       }
       if(uiObject.stepClicks === 4){
-         if(riverStartTime === -1){
-             riverStartTime = now
-             rivering = true
-         } 
+         triggerAnimationStart(riverAnimationData,now)
       }
-      if(hasFloped){
-         if(flopFlipStartTime === -1){
-            flopFlipStartTime = now
-            flopFlipping = true
-         }
-      }
-      if(hasTurned){
-         if(turnFlipStartTime === -1){
-            turnFlipStartTime = now
-            turnFlipping = true
-         }
-      }
-      if(hasRivered){
-         if(riverFlipStartTime === -1){
-            riverFlipStartTime = now
-            riverFlipping = true
-         }
-      }
-      if(uiObject.stepClicks === 0){
-        deltStartTime = -1;
-        flopStartTime = -1;
-        turnStartTime = -1;
-        riverStartTime = -1;
-        flopFlipStartTime = -1
-        turnFlipStartTime = -1
-        riverFlipStartTime = -1
-      }
+
       if(uiObject.stepClicks > 0){
-        if(dealing){
-            if(now-deltStartTime > 1){
-                dealing = false
-                hasDelt = true
+        if(dealAnimationData.running){
+            if(animationComplete(dealAnimationData, now)){
+                triggerAnimationStop(dealAnimationData)
             }
-            dealAnimation(globalPlayersNumber,ModelviewMatrix,textures,now-deltStartTime);
-        }else if(hasDelt){
+            dealAnimation(globalPlayersNumber,ModelviewMatrix,textures,now-dealAnimationData.startTime);
+        }else if(dealAnimationData.finished){
            var posArray = getPlayersPos(globalPlayersNumber);
            posArray.forEach((pos,posIndex) => {
                // player x
@@ -830,62 +782,63 @@ function webGLStart(images)
       } 
       if(uiObject.stepClicks > 1){
          var xs = {a:-.6,b:-.3,c:0}
-         if(floppping){
-            if(now-flopStartTime > 1){
-                floppping = false
-                hasFloped = true
+         if(flopAnimationData.running){
+            if(animationComplete(flopAnimationData,now)){
+                triggerAnimationStop(flopAnimationData)
             }
-            flopAnimation(xs,ModelviewMatrix,textures,now-flopStartTime);
-         }else if(hasFloped){
-            if(now-flopFlipStartTime > 1){
-               hasFloped = false
-               flopHasFlipped = true
+            flopAnimation(xs,ModelviewMatrix,textures,now-flopAnimationData.startTime);
+         }else if(flopAnimationData.finished && !flippingFlopAnimationData.finished && !flippingFlopAnimationData.running){
+            triggerAnimationStart(flippingFlopAnimationData, now)
+         }else if(flippingFlopAnimationData.running){
+            if(animationComplete(flippingFlopAnimationData,now)){
+               triggerAnimationStop(flippingFlopAnimationData)
             }
-            drawFlippingCard(true,xs.a+.3,0,0,0,ModelviewMatrix,textures,now-flopFlipStartTime,true)
-            drawFlippingCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures,now-flopFlipStartTime,true)
-            drawFlippingCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures,now-flopFlipStartTime,true)
-         }else if(flopHasFlipped){
+            drawFlippingCard(true,xs.a+.3,0,0,0,ModelviewMatrix,textures,now-flippingFlopAnimationData.startTime,true)
+            drawFlippingCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures,now-flippingFlopAnimationData.startTime,true)
+            drawFlippingCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures,now-flippingFlopAnimationData.startTime,true)
+         }else if(flippingFlopAnimationData.finished){
             drawFlop(xs,ModelviewMatrix,textures,texturesDict,'c','13')
          }
       }
       if(uiObject.stepClicks > 2){
          var xs = .6
-         if(turning){
-            if(now-turnStartTime > 1){
-                turning = false
-                hasTurned = true
+         if(turnAnimationData.running){
+            if(animationComplete(turnAnimationData,now)){
+                triggerAnimationStop(turnAnimationData)
             }
-            drawMovingCard(false,false,0,0,-.6,-.3,xs,-.3,ModelviewMatrix,textures[1],now-turnStartTime)
-         }else if(hasTurned){
-            if(now-turnFlipStartTime > 1){
-               hasTurned = false
-               turnHasFlipped = true
+            drawMovingCard(false,false,0,0,-.6,-.3,xs,-.3,ModelviewMatrix,textures[1],now-turnAnimationData.startTime)
+         }else if(turnAnimationData.finished && !flippingTurnAnimationData.finished && !flippingTurnAnimationData.running){
+            triggerAnimationStart(flippingTurnAnimationData,now)
+         }else if(flippingTurnAnimationData.running){
+            if(animationComplete(flippingTurnAnimationData,now)){
+               triggerAnimationStop(flippingTurnAnimationData)
             }
-            drawFlippingCard(true,xs,-.3,0,0,ModelviewMatrix,textures,now-turnFlipStartTime,false)
-         }else if(turnHasFlipped){
-           drawCard(true,xs,0,0,0,ModelviewMatrix,textures,texturesDict,'c','14')
-         }
+            drawFlippingCard(true,xs,-.3,0,0,ModelviewMatrix,textures,now-flippingTurnAnimationData.startTime,false)
+         }else if(flippingTurnAnimationData.finished){
+            drawCard(true,xs,0,0,0,ModelviewMatrix,textures,texturesDict,'c','14')
+          }
       }
       if(uiObject.stepClicks > 3){
          var xs = .9
-         if(rivering){
-            if(now-riverStartTime > 1){
-                rivering = false
-                hasRivered = true
+         if(riverAnimationData.running){
+            if(animationComplete(riverAnimationData,now)){
+               triggerAnimationStop(riverAnimationData)
             }
-            drawMovingCard(false,false,0,0,-.6,-.3,xs,-.3,ModelviewMatrix,textures[1],now-riverStartTime)
-         }else if(hasRivered){
-            if(now-riverFlipStartTime > 1){
-               hasRivered = false
-               riverHasFlipped = true
+            drawMovingCard(false,false,0,0,-.6,-.3,xs,-.3,ModelviewMatrix,textures[1],now-riverAnimationData.startTime)
+         }else if(riverAnimationData.finished && !flippingRiverAnimationData.finished && !flippingRiverAnimationData.running){
+            triggerAnimationStart(flippingRiverAnimationData,now)
+         }else if(flippingRiverAnimationData.running){
+            if(animationComplete(flippingRiverAnimationData,now)){
+               triggerAnimationStop(flippingRiverAnimationData)
             }
-            drawFlippingCard(true,xs,-.3,0,0,ModelviewMatrix,textures,now-riverFlipStartTime,false)
-         }else if(riverHasFlipped){
+            drawFlippingCard(true,xs,-.3,0,0,ModelviewMatrix,textures,now-flippingRiverAnimationData.startTime,false)
+         }else if(flippingRiverAnimationData.finished){
             drawCard(true,xs,0,0,0,ModelviewMatrix,textures,texturesDict,'c','14')
          }
       }
-      
-    
+
+      previousAnimationState = animationState
+
       //  request next frame
       requestAnimationFrame(Display);
    }
@@ -1155,6 +1108,35 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures){
       ret.x = cardX
       ret.delta = ((now*180) % 180)+180
       return ret
+   }
+
+   function getNewAnimationData(name){
+      return {
+         name: name,
+         running: false,
+         finished: false,
+         startTime: -1,
+      }
+   }
+
+   function triggerAnimationStart(animationData, now){
+      if(!animationData.running && !animationData.finished){
+         animationData.startTime = now
+         animationData.running = true
+      }
+   }
+
+   function animationComplete(animationData, now){
+      if(animationData.running && !animationData.finished){
+         return now-animationData.startTime > 1
+      }
+      return false
+   }
+
+   function triggerAnimationStop(animationData){
+      animationData.running = false
+      animationData.finished = true
+      animationState = 0
    }
 
    function dealAnimation(players,ModelviewMatrix,textures,now){
