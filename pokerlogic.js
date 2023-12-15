@@ -1,5 +1,5 @@
 export function pokerlogic(){
-    var uiVar = {uiElements:{},stepClicks:0,checkFlopToggle:false,peekCardsToggle:false}
+    var uiVar = {uiElements:{},stepClicks:0,stepFuse:false,checkFlopToggle:false,peekCardsToggle:false}
     document.addEventListener('DOMContentLoaded', function(event){
         _mainPokerLogic();
     });
@@ -8,15 +8,31 @@ export function pokerlogic(){
         uiSetup()
     };
 
-    function stepClicked(){
-        uiVar.stepClicks += 1
+    function dealClicked(){
+        uiVar.stepClicks = 1
+        uiVar.stepFuse = true
+    }
 
+    function flopClicked(){
+        uiVar.stepClicks = 2
+        uiVar.stepFuse = true
+    }
+
+    function turnClicked(){
+        uiVar.stepClicks = 4
+        uiVar.stepFuse = true
+    }
+
+    function riverClicked(){
+        uiVar.stepClicks = 6
+        uiVar.stepFuse = true
     }
 
     function resetClicked(){
-        uiVar.stepClicks = 0
+        uiVar.stepClicks = -1
         uiVar.checkFlopToggle = false
         uiVar.peekCardsToggle = false
+        uiVar.stepFuse = true
     }
 
     function checkFlopClicked(){
@@ -30,8 +46,17 @@ export function pokerlogic(){
     }
 
     function uiSetup(){
-        uiVar['step-button'] = document.getElementById('step-button');
-        uiVar['step-button'].addEventListener('click',stepClicked)
+        uiVar['deal-button'] = document.getElementById('deal-button');
+        uiVar['deal-button'].addEventListener('click',dealClicked)
+
+        uiVar['flop-button'] = document.getElementById('flop-button');
+        uiVar['flop-button'].addEventListener('click',flopClicked)
+
+        uiVar['turn-button'] = document.getElementById('turn-button');
+        uiVar['turn-button'].addEventListener('click',turnClicked)
+        
+        uiVar['river-button'] = document.getElementById('river-button');
+        uiVar['river-button'].addEventListener('click',riverClicked)
 
         uiVar['reset-button'] = document.getElementById('reset-button');
         uiVar['reset-button'].addEventListener('click',resetClicked)

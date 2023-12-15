@@ -690,14 +690,15 @@ function webGLStart(images)
    // set animation state to steps
    var previousAnimationState = 0
    var animationState = 0 // 0=rest , 1=deal , 2=flopping, 3=fflop, 4=turning, 5=fturn, 6=rivering, 7=friver
+   var nextAnimationState = 0
    var animations = {
-      deal: getNewAnimationData('deal',1),
-      flop: getNewAnimationData('flop',2),
-      flipping_flop: getNewAnimationData('flipping_flop',3),
-      turn: getNewAnimationData('turn',4),
-      flipping_turn: getNewAnimationData('flipping_turn',5),
-      river: getNewAnimationData('river',6),
-      flipping_river: getNewAnimationData('flipping_river',7)
+      deal: getNewAnimationData('deal',1,0),
+      flop: getNewAnimationData('flop',2,3),
+      flipping_flop: getNewAnimationData('flipping_flop',3,0),
+      turn: getNewAnimationData('turn',4,5),
+      flipping_turn: getNewAnimationData('flipping_turn',5,0),
+      river: getNewAnimationData('river',6,7),
+      flipping_river: getNewAnimationData('flipping_river',7,0)
    }
 
    var globalPlayersNumber = 9
@@ -752,7 +753,16 @@ function webGLStart(images)
       gl.uniformMatrix4fv(gl.getUniformLocation(prog,"ViewMatrix")  , false , ViewMatrix.getMat());
 
       previousAnimationState = animationState
-      animationState = uiObject.stepClicks
+
+      if(uiObject.stepFuse){
+         animationState = uiObject.stepClicks
+         uiObject.stepFuse = false
+         if(uiObject.stepClicks === -1){
+            resetAnimationData(animations)
+         }
+      }else{
+         animationState = nextAnimationState
+      }
 
       // draw static objects
       drawTable(ModelviewMatrix,textures[0]);
@@ -797,6 +807,9 @@ function webGLStart(images)
          if(animationObject.running){
             if(animationComplete(animationObject, now)){
                triggerAnimationStop(animationObject)
+               if(animationObject.nextAnimationState !== undefined){
+                  nextAnimationState = animationObject.nextAnimationState
+               }
            }
          }
       })
@@ -1097,13 +1110,14 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures){
       return ret
    }
 
-   function getNewAnimationData(name, animationState){
+   function getNewAnimationData(name, animationState, nextAnimationState){
       return {
          name: name,
          running: false,
          finished: false,
          startTime: -1,
-         animationState: animationState
+         animationState: animationState,
+         nextAnimationState: nextAnimationState,
       }
    }
 
@@ -1124,6 +1138,14 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures){
    function triggerAnimationStop(animationData){
       animationData.running = false
       animationData.finished = true
+   }
+
+   function resetAnimationData(animations){
+      _each(animations, (animationData)=>{
+         animationData.running = false
+         animationData.finished = false
+         animationData.startTime = -1
+      })
    }
 
    function dealAnimation(players,ModelviewMatrix,textures,now){
