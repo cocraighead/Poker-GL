@@ -1130,7 +1130,7 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures){
 
    function animationComplete(animationData, now){
       if(animationData.running && !animationData.finished){
-         return now-animationData.startTime > 1
+         return now-animationData.startTime >= 1
       }
       return false
    }

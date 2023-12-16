@@ -1,5 +1,5 @@
 export function pokerlogic(){
-    var uiVar = {uiElements:{},stepClicks:0,stepFuse:false,checkFlopToggle:false,peekCardsToggle:false}
+    var uiVar = {stepClicks:0,stepFuse:false,checkFlopToggle:false,peekCardsToggle:false}
     document.addEventListener('DOMContentLoaded', function(event){
         _mainPokerLogic();
     });
@@ -66,13 +66,6 @@ export function pokerlogic(){
 
         uiVar['peek-cards-button'] = document.getElementById('peek-cards-button');
         uiVar['peek-cards-button'].addEventListener('click',peekCardsClicked)
-    }
-
-    function updateElementProperty(elementId, property, value){
-        var element = uiVar.uiElements[elementId]
-        if(element){
-            element[property] = value
-        }
     }
 
     return uiVar
