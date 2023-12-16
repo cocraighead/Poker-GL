@@ -1,12 +1,14 @@
 var uiObject
+var gameObject
 
 var imagesFolder = 'textures/'
 var suites = ['c']
 var cardNumbersStart = '2'
 var cardNumbersEnd = '14'
 
-function __main__(ui){
-    uiObject = ui 
+function __main__(pokerlogicInstance){
+    uiObject = pokerlogicInstance.uiVar
+    gameObject = pokerlogicInstance.gameVar
     
     var imagesArr = [
       imagesFolder+'wood.jpg',
@@ -701,9 +703,6 @@ function webGLStart(images)
       flipping_river: getNewAnimationData('flipping_river',7,0)
    }
 
-   var globalPlayersNumber = 9
-   var playingAs = 2
-
    // x shift vars
    var xs_flop = {a:-.6,b:-.3,c:0}
    var xs_turn = .6
@@ -739,7 +738,7 @@ function webGLStart(images)
       if(uiObject.checkFlopToggle){
          ViewMatrix.lookAt(.3,1.5,0 , .3,0,0, 0,0,-1);
       }else if(uiObject.peekCardsToggle){
-         var posObj = getPlayersEyes(globalPlayersNumber,playingAs)
+         var posObj = getPlayersEyes(gameObject.numberOfPlayers,gameObject.playingAs)
          ViewMatrix.lookAt(posObj.x,.25,posObj.z , 0,.25,0, 0,1,0);
          // ViewMatrix.lookAt(Ex,Ey,Ez , 0,0,0, 0,Math.cos(ph),0);
       }else{
@@ -770,10 +769,10 @@ function webGLStart(images)
 
       // if animation is complete draw static objects
       if(animations['deal'].finished){
-         var posArray = getPlayersPos(globalPlayersNumber);
+         var posArray = getPlayersPos(gameObject.numberOfPlayers);
          posArray.forEach((pos,posIndex) => {
              // player x
-             if(posIndex === playingAs && uiObject.peekCardsToggle){
+             if(posIndex === gameObject.playingAs && uiObject.peekCardsToggle){
                 drawPeakingCard(false,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures)
                 // drawPeakingCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures)
              }else{
@@ -816,7 +815,7 @@ function webGLStart(images)
 
       // draw animations that are running
       if(animations['deal'].running){
-         dealAnimation(globalPlayersNumber,ModelviewMatrix,textures,now-animations['deal'].startTime);
+         dealAnimation(gameObject.numberOfPlayers,ModelviewMatrix,textures,now-animations['deal'].startTime);
       }
       if(animations['flop'].running){
          flopAnimation(xs_flop,ModelviewMatrix,textures,now-animations['flop'].startTime);

@@ -1,5 +1,24 @@
+import * as Deck from './Classes/Deck.js'
+
 export function pokerlogic(){
+    // Game Engine
+    var gameVar = {
+        suites: ['c'],
+        cardNumbersStart: '2',
+        cardNumbersEnd: '14',
+        numberOfPlayers: 9,
+        playingAs: 2,
+        
+        setUpGame: function(){
+            this.deck = new Deck(this.suites,this.cardNumbersStart,this.cardNumbersEnd)
+            this.players = []
+            this.board = []
+        }
+    }
+    
+    /// UI
     var uiVar = {stepClicks:0,stepFuse:false,checkFlopToggle:false,peekCardsToggle:false}
+
     document.addEventListener('DOMContentLoaded', function(event){
         _mainPokerLogic();
     });
@@ -68,5 +87,5 @@ export function pokerlogic(){
         uiVar['peek-cards-button'].addEventListener('click',peekCardsClicked)
     }
 
-    return uiVar
+    return {uiVar,gameVar}
 }
