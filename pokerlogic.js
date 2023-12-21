@@ -1,4 +1,6 @@
 import * as Deck from './Classes/Deck.js'
+import * as Player from './Classes/Player.js'
+import * as Card from './Classes/Card.js'
 
 export function pokerlogic(){
     // Game Engine
@@ -11,9 +13,33 @@ export function pokerlogic(){
         
         setUpGame: function(){
             this.deck = new Deck(this.suites,this.cardNumbersStart,this.cardNumbersEnd)
+            this.deck.shuffle(1)
             this.players = []
+            for(var i=0;i<numberOfPlayers;i++){
+                this.players.push(
+                    new Player(i)
+                )
+            }
             this.board = []
-        }
+        },
+
+        deal: function(){
+            for(var i=0;i<this.players.length;i++){
+                this.players[i].hand.push(this.deck.pop())
+            }
+            for(var i=0;i<this.players.length;i++){
+                this.players[i].hand.push(this.deck.pop())
+            }
+        },
+
+        burnAndTurn: function(burn,turn){
+            for(var i=0;i<burn;i++){
+                this.deck.pop()
+            }
+            for(var i=0;i<turn;i++){
+                this.board.push(this.deck.pop())
+            }
+        },
     }
     
     /// UI

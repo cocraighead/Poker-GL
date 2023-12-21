@@ -12,5 +12,24 @@ export class Deck  {
         });
     }
 
+    pop(){
+        return this.cards.shift();
+    }
+
+    remove(index){
+        return this.cards.splice(index, 1);
+    }
+
+    shuffle(shuffles){
+        for(var i=0;i<shuffles;i++){
+            var bag = []
+            var numCards = this.cards.length
+            for(var j=0;j<numCards;j++){
+                bag.push(this.cards.remove(randIndex))
+                this.cards = bag
+            }
+        }
+    }
+
 
 }
