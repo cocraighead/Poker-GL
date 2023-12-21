@@ -1,15 +1,9 @@
-Homework 5
+Poker Game using WebGL
 
 Colin Craighead
-CSCI4229 Spring 2021
 
-Created the beginings of a wooden record player in webGl.
+- I was using 'http-server -o poker.html' to open the project to avoid cors blocking me from loading textures.
 
-- I was using 'http-server -o poker.html' to open the project to avoid cors blocking me from loading the wood texture.
-- cd "C:\Users\Zed God\Documents\Code Docs\Poker GL"
-
-*  Key bindings:
- *  Drag mouse to rotate scene
 
 
  TODO:
