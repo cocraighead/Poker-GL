@@ -5,10 +5,10 @@ import {Card} from './Classes/Card.js'
 export function pokerlogic(){
     // Game Engine
     var gameVar = {
-        suites: ['c'],
+        suites: ['c','s','h','d'],
         cardNumbersStart: '2',
         cardNumbersEnd: '14',
-        numberOfPlayers: 2,
+        numberOfPlayers: 9,
         playingAs: 2,
 
         gameState: 0, // 0=game started , 1=rest , 2=flop, 3=turn, 4=river

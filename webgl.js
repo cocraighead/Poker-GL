@@ -2,15 +2,12 @@ var uiObject
 var gameObject
 
 var imagesFolder = 'textures/'
-var suites = ['c']
-var cardNumbersStart = '2'
-var cardNumbersEnd = '14'
 
 function __main__(pokerlogicInstance){
     uiObject = pokerlogicInstance.uiVar
     gameObject = pokerlogicInstance.gameVar
 
-    pokerlogicInstance.gameVar.setUpGame()
+    gameObject.setUpGame()
     
     var imagesArr = [
       imagesFolder+'wood.jpg',
@@ -18,9 +15,9 @@ function __main__(pokerlogicInstance){
       imagesFolder+'double_card_back.png'
    ]
 
-   for(var suitei=0;suitei<suites.length;suitei++){
-      for(var cardi=Number(cardNumbersStart);cardi<=Number(cardNumbersEnd);cardi++){
-         imagesArr.push(imagesFolder+'card_'+suites[suitei]+cardi+'.png')
+   for(var suitei=0;suitei<gameObject.suites.length;suitei++){
+      for(var cardi=Number(gameObject.cardNumbersStart);cardi<=Number(gameObject.cardNumbersEnd);cardi++){
+         imagesArr.push(imagesFolder+'card_'+gameObject.suites[suitei]+cardi+'.png')
       }
    }
    
