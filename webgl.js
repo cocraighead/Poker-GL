@@ -9,6 +9,8 @@ var cardNumbersEnd = '14'
 function __main__(pokerlogicInstance){
     uiObject = pokerlogicInstance.uiVar
     gameObject = pokerlogicInstance.gameVar
+
+    pokerlogicInstance.gameVar.setUpGame()
     
     var imagesArr = [
       imagesFolder+'wood.jpg',
@@ -759,6 +761,7 @@ function webGLStart(images)
          if(uiObject.stepClicks === -1){
             resetAnimationData(animations)
          }
+         gameObject.run(uiObject.stepClicks)
       }else{
          animationState = nextAnimationState
       }
@@ -782,13 +785,13 @@ function webGLStart(images)
           })
       }
       if(animations['flipping_flop'].finished){
-         drawFlop(xs_flop,ModelviewMatrix,textures,texturesDict,'c','13')
+         drawFlop(xs_flop,ModelviewMatrix,textures,texturesDict,gameObject.board)
       }
       if(animations['flipping_turn'].finished){
-         drawCard(true,xs_turn,0,0,0,ModelviewMatrix,textures,texturesDict,'c','14')
+         drawCard(true,xs_turn,0,0,0,ModelviewMatrix,textures,texturesDict,gameObject.board[3].suite,gameObject.board[3].number)
       }
       if(animations['flipping_river'].finished){
-         drawCard(true,xs_river,0,0,0,ModelviewMatrix,textures,texturesDict,'c','14')
+         drawCard(true,xs_river,0,0,0,ModelviewMatrix,textures,texturesDict,gameObject.board[4].suite,gameObject.board[4].number)
       }
 
       // trigger animation if new state
@@ -821,21 +824,21 @@ function webGLStart(images)
          flopAnimation(xs_flop,ModelviewMatrix,textures,now-animations['flop'].startTime);
       }
       if(animations['flipping_flop'].running){
-         drawFlippingCard(true,xs_flop.a+.3,0,0,0,ModelviewMatrix,textures,now-animations['flipping_flop'].startTime,true)
-         drawFlippingCard(true,xs_flop.b+.3,0,0,0,ModelviewMatrix,textures,now-animations['flipping_flop'].startTime,true)
-         drawFlippingCard(true,xs_flop.c+.3,0,0,0,ModelviewMatrix,textures,now-animations['flipping_flop'].startTime,true)
+         drawFlippingCard(true,xs_flop.a+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameObject.board[0].suite,gameObject.board[0].number,now-animations['flipping_flop'].startTime,true)
+         drawFlippingCard(true,xs_flop.b+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameObject.board[1].suite,gameObject.board[1].number,now-animations['flipping_flop'].startTime,true)
+         drawFlippingCard(true,xs_flop.c+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameObject.board[2].suite,gameObject.board[2].number,now-animations['flipping_flop'].startTime,true)
       }
       if(animations['turn'].running){
          drawMovingCard(false,false,0,0,-.6,-.3,xs_turn,-.3,ModelviewMatrix,textures[1],now-animations['turn'].startTime)
       }
       if(animations['flipping_turn'].running){
-         drawFlippingCard(true,xs_turn,-.3,0,0,ModelviewMatrix,textures,now-animations['flipping_turn'].startTime,false)
+         drawFlippingCard(true,xs_turn,-.3,0,0,ModelviewMatrix,textures,texturesDict,gameObject.board[3].suite,gameObject.board[3].number,now-animations['flipping_turn'].startTime,false)
       }
       if(animations['river'].running){
          drawMovingCard(false,false,0,0,-.6,-.3,xs_river,-.3,ModelviewMatrix,textures[1],now-animations['river'].startTime)
       }
       if(animations['flipping_river'].running){
-         drawFlippingCard(true,xs_river,-.3,0,0,ModelviewMatrix,textures,now-animations['flipping_river'].startTime,false)
+         drawFlippingCard(true,xs_river,-.3,0,0,ModelviewMatrix,textures,texturesDict,gameObject.board[4].suite,gameObject.board[4].number,now-animations['flipping_river'].startTime,false)
       }
 
       //  request next frame
@@ -890,9 +893,9 @@ function getCardTexture(faceUp, suite, cardNumber, texturesDict){
    return texObject ? texObject.tex : {}
 }
 
-function drawFlippingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,now,horizontal){
+function drawFlippingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,texturesDict,suite,cardNumber,now,horizontal){
    var posObj = horizontal ? flipCardHorizontalPosition(x,ySit,z,now) : flipCardVerticalPosition(x,ySit,z,now)
-   gl.bindTexture(gl.TEXTURE_2D,faceUp?textures[15]:textures[2])
+   gl.bindTexture(gl.TEXTURE_2D,getCardTexture(faceUp,suite,cardNumber,texturesDict))
    //  Bind cube buffer
    gl.bindBuffer(gl.ARRAY_BUFFER,card);
    //  Set up 3D vertex array
@@ -1162,10 +1165,10 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures){
       drawMovingCard(false,false,0,0,-.9,0,xs.c,0,ModelviewMatrix,textures[1],now)
    }
 
-   function drawFlop(xs,ModelviewMatrix,textures,texturesDict,suite,cardNumber){
-      drawCard(true,xs.a+.3,0,0,0,ModelviewMatrix,textures,texturesDict,suite,cardNumber)
-      drawCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures,texturesDict,suite,cardNumber)
-      drawCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures,texturesDict,suite,cardNumber)         
+   function drawFlop(xs,ModelviewMatrix,textures,texturesDict,gameBoard){
+      drawCard(true,xs.a+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[0].suite,gameBoard[0].number)
+      drawCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[1].suite,gameBoard[1].number)
+      drawCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[2].suite,gameBoard[2].number)         
    }
 
    function getPlayersPos(numPlayers){

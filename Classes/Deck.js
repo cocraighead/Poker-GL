@@ -1,4 +1,4 @@
-import * as Card from './Card.js'
+import {Card} from './Card.js'
 
 export class Deck  {
     constructor(suites,cardNumbersStart,cardNumbersEnd) {
@@ -17,7 +17,7 @@ export class Deck  {
     }
 
     remove(index){
-        return this.cards.splice(index, 1);
+        return this.cards.splice(index, 1)[0];
     }
 
     shuffle(shuffles){
@@ -25,9 +25,10 @@ export class Deck  {
             var bag = []
             var numCards = this.cards.length
             for(var j=0;j<numCards;j++){
-                bag.push(this.cards.remove(randIndex))
-                this.cards = bag
+                var randIndex = Math.floor(Math.random() * this.cards.length);
+                bag.push(this.remove(randIndex))
             }
+            this.cards = bag
         }
     }
 

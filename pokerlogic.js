@@ -1,6 +1,6 @@
-import * as Deck from './Classes/Deck.js'
-import * as Player from './Classes/Player.js'
-import * as Card from './Classes/Card.js'
+import {Deck} from './Classes/Deck.js'
+import {Player} from './Classes/Player.js'
+import {Card} from './Classes/Card.js'
 
 export function pokerlogic(){
     // Game Engine
@@ -8,38 +8,63 @@ export function pokerlogic(){
         suites: ['c'],
         cardNumbersStart: '2',
         cardNumbersEnd: '14',
-        numberOfPlayers: 9,
+        numberOfPlayers: 2,
         playingAs: 2,
+
+        gameState: 0, // 0=game started , 1=rest , 2=flop, 3=turn, 4=river
+        gameStateFuse: false,
         
         setUpGame: function(){
             this.deck = new Deck(this.suites,this.cardNumbersStart,this.cardNumbersEnd)
             this.deck.shuffle(1)
             this.players = []
-            for(var i=0;i<numberOfPlayers;i++){
+            for(var i=0;i<this.numberOfPlayers;i++){
                 this.players.push(
                     new Player(i)
                 )
             }
             this.board = []
+
+            this.gameState = 1
         },
 
         deal: function(){
             for(var i=0;i<this.players.length;i++){
-                this.players[i].hand.push(this.deck.pop())
+                this.players[i].hand.push(this.deck.cards.pop())
             }
             for(var i=0;i<this.players.length;i++){
-                this.players[i].hand.push(this.deck.pop())
+                this.players[i].hand.push(this.deck.cards.pop())
             }
+            this.gameState = 1
         },
 
         burnAndTurn: function(burn,turn){
             for(var i=0;i<burn;i++){
-                this.deck.pop()
+                this.deck.cards.pop()
             }
             for(var i=0;i<turn;i++){
-                this.board.push(this.deck.pop())
+                this.board.push(this.deck.cards.pop())
             }
+            this.gameState = 1
         },
+
+        run: function(stepClicks){
+            if(stepClicks === 1){
+                this.deal()
+            }else if(stepClicks === 2){
+                this.burnAndTurn(1,3)
+            }else if(stepClicks === 4){
+                this.burnAndTurn(1,1)
+            }else if(stepClicks === 6){
+                this.burnAndTurn(1,1)
+            }else if(stepClicks === -1){
+                this.setUpGame()
+                this.gameState = 0
+            }
+
+        }
+
+
     }
     
     /// UI

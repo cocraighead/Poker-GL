@@ -1,4 +1,4 @@
-import * as Card from './Card.js'
+import {Card} from './Card.js'
 
 export class Player  {
     constructor(position) {
