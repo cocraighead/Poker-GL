@@ -12,7 +12,6 @@ export function pokerlogic(){
         playingAs: 2,
 
         gameState: 0, // 0=game started , 1=rest , 2=flop, 3=turn, 4=river
-        gameStateFuse: false,
         
         setUpGame: function(){
             this.deck = new Deck(this.suites,this.cardNumbersStart,this.cardNumbersEnd)
