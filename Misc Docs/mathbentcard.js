@@ -2,14 +2,33 @@ const fs = require('fs');
 // const { isAsyncFunction } = require('util/types');
 
 
-function addNormal(point){
-    var n1 = 0
-    var n2 = 0
-    var n3 = 1
+function addNormal(point1,point2,point3){
+    var V = [
+        point2[0] - point1[0],
+        point2[1] - point1[1],
+        point2[2] - point1[2]
+    ] 
+    var U = [
+        point3[0] - point1[0],
+        point3[1] - point1[1],
+        point3[2] - point1[2]
+    ]
 
-    point.push(n1)
-    point.push(n2)
-    point.push(n3)
+    var VxU = [
+        [V[1]*U[2] - V[2]*U[1]],
+        [V[2]*U[0] - V[0]*U[2]],
+        [V[0]*U[1] - V[2]*U[0]]
+    ]
+
+    var VxUMagnitude = Math.abs(Math.sqrt(VxU[0]*VxU[0] + VxU[1]*VxU[1] + VxU[2]*VxU[2]))
+
+    VxU[0] /= VxUMagnitude
+    VxU[1] /= VxUMagnitude
+    VxU[2] /= VxUMagnitude
+
+    point1.push(VxU[0])
+    point2.push(VxU[1])
+    point3.push(VxU[2])
 }
 
 function addColor(point){

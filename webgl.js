@@ -12,7 +12,8 @@ function __main__(pokerlogicInstance){
     var imagesArr = [
       imagesFolder+'wood.jpg',
       imagesFolder+'card_backs.jpg',
-      imagesFolder+'double_card_back.png'
+      imagesFolder+'double_card_back.png',
+      imagesFolder+'highlights.png'
    ]
 
    for(var suitei=0;suitei<gameObject.suites.length;suitei++){
@@ -2712,6 +2713,7 @@ function webGLStart(images)
       // enable animation
       now *= 0.001;
       var deltaTime = now - then;
+      // console.log('fps',1/(deltaTime)) // FPS LOG
       then = now;
       zh += 1.2 * deltaTime;
       // pass light position
@@ -2766,7 +2768,7 @@ function webGLStart(images)
              // player x
              if(posIndex === gameObject.playingAs && uiObject.peekCardsToggle){
                 drawPeakingCard(true,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures,texturesDict,gameObject.players[posIndex].hand[0].suite,gameObject.players[posIndex].hand[0].number)
-                drawPeakingCard(true,pos.x2,pos.z2,0,pos.delta2,ModelviewMatrix,textures,texturesDict,gameObject.players[posIndex].hand[1].suite,gameObject.players[posIndex].hand[1].number)
+                drawPeakingCard(true,pos.x2,pos.z2,0,pos.delta1,ModelviewMatrix,textures,texturesDict,gameObject.players[posIndex].hand[1].suite,gameObject.players[posIndex].hand[1].number)
                 // drawPeakingCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures)
              }else{
                 drawCard(false,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures,texturesDict,'c','14')
@@ -2862,6 +2864,63 @@ function webGLStart(images)
     cube1MVM.translate(x,.05,z);
     cube1MVM.rotate(20,0,1,0);
     cube1MVM.scale(.1,.05,.15);
+    gl.uniformMatrix4fv(gl.getUniformLocation(prog,"ModelviewMatrix")  , false , cube1MVM.getMat());
+    gl.uniformMatrix3fv(gl.getUniformLocation(prog,"NormalMatrix")  , false , cube1MVM.normalMatrix());
+    gl.drawArrays(gl.TRIANGLES,0,n);
+
+    //  Disable vertex arrays
+    gl.disableVertexAttribArray(XYZ);
+    gl.disableVertexAttribArray(NORM);
+    gl.disableVertexAttribArray(RGB);
+    gl.disableVertexAttribArray(T2D);
+
+    drawBoxHighlight(cube1MVM,textures[3],cube_data)
+}
+
+function drawBoxHighlight(ModelviewMatrix,tex,bufferAsArray){
+   // calulate box expansion
+   // get max x,y,z of data buffer
+   let start = 0
+   let jump = 11
+   var arrayMaxesArray = [-1,-1,-1]
+   for(var bi=start;bi<bufferAsArray.length;bi+=jump){
+      for(var xyzi=0;xyzi<3;xyzi++){
+         if(Math.abs(bufferAsArray[bi]) > arrayMaxesArray[xyzi]){
+            arrayMaxesArray[xyzi] = Math.abs(bufferAsArray[bi])
+         }
+      }
+   }
+   var paddingFactor = .75
+   let xyzScale = [
+      arrayMaxesArray[0] + arrayMaxesArray[0]*paddingFactor,
+      arrayMaxesArray[1] + arrayMaxesArray[1]*paddingFactor,
+      arrayMaxesArray[2] + arrayMaxesArray[2]*paddingFactor
+   ]
+   gl.bindTexture(gl.TEXTURE_2D,tex)
+    //  Bind cube buffer
+    gl.bindBuffer(gl.ARRAY_BUFFER,cube);
+    //  Set up 3D vertex array
+    var XYZ = gl.getAttribLocation(prog,"XYZ");
+    gl.enableVertexAttribArray(XYZ);
+    gl.vertexAttribPointer(XYZ,3,gl.FLOAT,false,44,0);
+    // Set up 3D normal array
+    var NORM = gl.getAttribLocation(prog,"NORM");
+    gl.enableVertexAttribArray(NORM);
+    gl.vertexAttribPointer(NORM,3,gl.FLOAT,false,44,12);
+    //  Set up 3D color array
+    var RGB = gl.getAttribLocation(prog,"RGB");
+    gl.enableVertexAttribArray(RGB);
+    gl.vertexAttribPointer(RGB,3,gl.FLOAT,false,44,24);
+    //  Set up 2D texture array
+    var T2D = gl.getAttribLocation(prog,"T2D");
+    gl.enableVertexAttribArray(T2D);
+    gl.vertexAttribPointer(T2D,2,gl.FLOAT,false,44,36);
+
+    //  table
+    var cube1MVM = new mat4(ModelviewMatrix);
+   //  cube1MVM.translate(x,.05,z);
+   //  cube1MVM.rotate(20,0,1,0);
+    cube1MVM.scale(xyzScale[0],.001,xyzScale[2]);
     gl.uniformMatrix4fv(gl.getUniformLocation(prog,"ModelviewMatrix")  , false , cube1MVM.getMat());
     gl.uniformMatrix3fv(gl.getUniformLocation(prog,"NormalMatrix")  , false , cube1MVM.normalMatrix());
     gl.drawArrays(gl.TRIANGLES,0,n);
