@@ -3,4 +3,7 @@ export class Card  {
         this.suite = suite;
         this.number = number;
     }
+    toString() {
+        return this.suite+this.number;
+      }
   }

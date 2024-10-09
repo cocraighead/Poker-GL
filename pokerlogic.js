@@ -134,6 +134,7 @@ export function pokerlogic(){
             }else if(stepClicks === -1){
                 this.setUpGame()
             }
+            renderUI()
         },
 
         bet: function(amount,playerIndex){
@@ -176,11 +177,6 @@ export function pokerlogic(){
     function dealClicked(){
         uiVar.stepClicks = 1
         uiVar.stepFuse = true
-        renderUI()
-    }
-
-    function resetClicked(){
-        gameVar.setUpRound()
         renderUI()
     }
 
@@ -251,9 +247,6 @@ export function pokerlogic(){
         uiVar['deal-button'] = document.getElementById('deal-button');
         uiVar['deal-button'].addEventListener('click',dealClicked)
 
-        uiVar['reset-button'] = document.getElementById('reset-button');
-        uiVar['reset-button'].addEventListener('click',resetClicked)
-
         uiVar['check-flop-button'] = document.getElementById('check-flop-button');
         uiVar['check-flop-button'].addEventListener('click',checkFlopClicked)
 
@@ -278,19 +271,29 @@ export function pokerlogic(){
         var theader = table.createTHead()
         var theaderRow = theader.insertRow()
         var tbody = table.createTBody()
-        var properties = ['position','isIn','total','totalInPot']
+        var properties = [
+            {id:'position',label:'P#'},
+            {id:'total',label:'$stack'},
+            {id:'totalInPot',label:'$inPot'}
+        ]
         for(var j=0;j<properties.length;j++){
             var hr = theaderRow.insertCell()
-            hr.innerHTML = properties[j]
+            hr.innerHTML = properties[j].label
         }
+        var hr = theaderRow.insertCell()
+        hr.innerHTML = 'hand'
         for(var i=0;i<gameVar.players.length;i++){
-            var tr = tbody.insertRow()
-            if(i===gameVar.currentPlayerIndex){
-                tr.classList.add('table-row-current-player') 
-            }
-            for(var j=0;j<properties.length;j++){
+            if(gameVar.players[i].isIn){
+                var tr = tbody.insertRow()
+                if(i===gameVar.currentPlayerIndex){
+                    tr.classList.add('table-row-current-player') 
+                }
+                for(var j=0;j<properties.length;j++){
+                    var td = tr.insertCell()
+                    td.innerHTML = gameVar.players[i][properties[j].id]
+                }
                 var td = tr.insertCell()
-                td.innerHTML = gameVar.players[i][properties[j]]
+                td.innerHTML = gameVar.players[i].handToString()
             }
         }
         $("#data-table").html(table)
@@ -298,8 +301,6 @@ export function pokerlogic(){
 
     function renderUI(){
         uiVar['deal-button'].disabled = uiVar.stepClicks >= 1
-
-        uiVar['reset-button'].disabled = false
 
         uiVar['check-flop-button'].disabled = uiVar.stepClicks < 2
 
