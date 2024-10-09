@@ -2731,7 +2731,7 @@ function webGLStart(images)
       if(uiObject.checkFlopToggle){
          ViewMatrix.lookAt(.3,1.5,0 , .3,0,0, 0,0,-1);
       }else if(uiObject.peekCardsToggle){
-         var posObj = getPlayersEyes(gameObject.players.length,gameObject.playingAs)
+         var posObj = getPlayersEyes(gameObject.players.length,gameObject.currentPlayerIndex)
          ViewMatrix.lookAt(posObj.x,.25,posObj.z , 0,.25,0, 0,1,0);
          //ViewMatrix.lookAt(Ex,Ey,Ez , 0,0,0, 0,Math.cos(ph),0);
       }else{
@@ -2765,14 +2765,16 @@ function webGLStart(images)
       if(animations['deal'].finished){
          var posArray = getPlayersPos(gameObject.players.length);
          posArray.forEach((pos,posIndex) => {
-             // player x
-             if(posIndex === gameObject.playingAs && uiObject.peekCardsToggle){
-                drawPeakingCard(true,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures,texturesDict,gameObject.players[posIndex].hand[0].suite,gameObject.players[posIndex].hand[0].number)
-                drawPeakingCard(true,pos.x2,pos.z2,0,pos.delta1,ModelviewMatrix,textures,texturesDict,gameObject.players[posIndex].hand[1].suite,gameObject.players[posIndex].hand[1].number)
-                // drawPeakingCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures)
-             }else{
-                drawCard(false,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures,texturesDict,'c','14')
-                drawCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures,texturesDict,'c','14')
+             if(gameObject.players[posIndex].isIn){
+               // player x
+               if(posIndex === gameObject.currentPlayerIndex && uiObject.peekCardsToggle){
+                  drawPeakingCard(true,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures,texturesDict,gameObject.players[posIndex].hand[0].suite,gameObject.players[posIndex].hand[0].number)
+                  drawPeakingCard(true,pos.x2,pos.z2,0,pos.delta1,ModelviewMatrix,textures,texturesDict,gameObject.players[posIndex].hand[1].suite,gameObject.players[posIndex].hand[1].number)
+                  // drawPeakingCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures)
+               }else{
+                  drawCard(false,pos.x1,pos.z1,0,pos.delta1,ModelviewMatrix,textures,texturesDict,'c','14')
+                  drawCard(false,pos.x2,pos.z2,.001,pos.delta2,ModelviewMatrix,textures,texturesDict,'c','14')
+               }
              }
           })
       }
@@ -2874,9 +2876,10 @@ function webGLStart(images)
     gl.disableVertexAttribArray(RGB);
     gl.disableVertexAttribArray(T2D);
 
-    drawBoxHighlight(cube1MVM,textures[3],cube_data)
+    // drawBoxHighlight(cube1MVM,textures[3],cube_data)
 }
 
+// seems like it lags the scene
 function drawBoxHighlight(ModelviewMatrix,tex,bufferAsArray){
    // calulate box expansion
    // get max x,y,z of data buffer

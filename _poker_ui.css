@@ -10,6 +10,36 @@
     background-color: rgb(213, 213, 213);
 }
 
+.data-table-class table, th, td{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+.table-row-current-player{
+    font-weight: bold;
+}
+
+.button-input-wrapper{
+    margin: 24px;
+    height: 20px;
+    width: 60%;
+}
+
+.raise-button{
+    background-color: green;
+    border: 1px solid black;
+    width: 100%;
+}
+
+.raise-input{
+    width: 100%;
+}
+
+.raise-button:hover:enabled{
+    background-color: rgb(60, 179, 60);
+    border: 1px solid rgb(227, 220, 88)ca;
+}
+
 .green-button{
     background-color: green;
     border: 1px solid black;
@@ -18,7 +48,7 @@
     height: 20px;
 }
 
-.green-button:hover{
+.green-button:hover:enabled{
     background-color: rgb(60, 179, 60);
     border: 1px solid rgb(227, 220, 88)ca;
     width: 60%;
