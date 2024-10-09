@@ -3,8 +3,9 @@ import {Player} from './Classes/Player.js'
 import {Card} from './Classes/Card.js'
 
 export function pokerlogic(){
-    // Game Engine
+    // Game Object
     var gameVar = {
+        // game params
         suites: ['c','s','h','d'],
         cardNumbersStart: '2',
         cardNumbersEnd: '14',
@@ -12,6 +13,9 @@ export function pokerlogic(){
         smallBlind: 1,
         bigBlind: 3,
         
+        /**
+         * sets up a new games values
+         */
         setUpGame: function(){
             this.players = []
             for(var i=0;i<this.numberOfPlayers;i++){
@@ -22,9 +26,11 @@ export function pokerlogic(){
             this.board = []
             this.setUpRound()
         },
-
+        /**
+         * re-sets values for a new round
+         */
         setUpRound: function(){
-            // ui
+            // ui / animation
             uiVar.stepClicks = -1
             uiVar.checkFlopToggle = false
             uiVar.peekCardsToggle = false
@@ -39,7 +45,7 @@ export function pokerlogic(){
                 this.players[i].isIn = true
                 this.players[i].totalInPot = 0
             }
-            // blinds
+            // blinds and first action
             if(this.numberOfPlayers === 2){
                 this.bet(this.bigBlind,(this.dealerIndex+1)%this.numberOfPlayers)
                 this.currentPlayerIndex = this.dealerIndex
@@ -50,22 +56,32 @@ export function pokerlogic(){
             }
             this.setUpStreet()
         },
-
+        /**
+         * re-sets values for a new street
+         */
         setUpStreet: function(){
+            // indicate players haven't had a chance to bet this street
             for(var i=0;i<this.numberOfPlayers;i++){
                 this.players[i].firstTurnOnStreet = true
             }
         },
-
+        /**
+         * gives each player 2 cards from deck
+         * this follows the correct deal order
+         */
         deal: function(){
-            for(var i=0;i<this.players.length;i++){
-                this.players[i].hand.push(this.deck.cards.pop())
-            }
-            for(var i=0;i<this.players.length;i++){
-                this.players[i].hand.push(this.deck.cards.pop())
+            for(var n=0;n<2;n++){ // deal 2 cards
+                for(var i=0;i<this.players.length;i++){
+                    var iPlayer = (this.currentPlayerIndex+i)%this.players.length
+                    this.players[iPlayer].hand.push(this.deck.cards.pop())
+                }
             }
         },
-
+        /**
+         * used to flop, turn, and river the cards
+         * @param {*} burn # of cards to burn
+         * @param {*} turn # of cards to turn
+         */
         burnAndTurn: function(burn,turn){
             for(var i=0;i<burn;i++){
                 this.deck.cards.pop()
@@ -74,8 +90,13 @@ export function pokerlogic(){
                 this.board.push(this.deck.cards.pop())
             }
         },
-
+        /**
+         * determines who has the next action
+         * can be a new street or round
+         * @returns {index,newStreet,newRound} - index of next player,bool,bool
+         */
         nextAction: function(){
+            // 1 player in = new round
             var numPlayersIn = 0
             for(var i=0;i<this.numberOfPlayers;i++){
                 if(this.players[i].isIn){
@@ -98,7 +119,7 @@ export function pokerlogic(){
                     return {index:iPlayer,newStreet:false,newRound:false}
                 }
             }
-            // next action new round
+            // next action new street
             for(var i=0;i<this.numberOfPlayers;i++){
                 var iPlayer = (this.dealerIndex+i+1)%this.numberOfPlayers
                 if(this.players[iPlayer].isIn){
@@ -106,7 +127,9 @@ export function pokerlogic(){
                 }
             }
         },
-
+        /**
+         * sets up a new street and triggers animation
+         */
         nextStreet: function(){
             this.setUpStreet()
             // trigger animation
@@ -121,7 +144,11 @@ export function pokerlogic(){
                 uiVar.stepFuse = true
             }
         },
-
+        /**
+         * runs the action
+         * this is triggered by webGL before animation starts
+         * @param {*} stepClicks 
+         */
         run: function(stepClicks){
             if(stepClicks === 1){
                 this.deal()
@@ -136,18 +163,29 @@ export function pokerlogic(){
             }
             renderUI()
         },
-
+        /**
+         * bets an amount for a player
+         * @param {*} amount - $
+         * @param {*} playerIndex - player to bet 
+         */
         bet: function(amount,playerIndex){
             this.players[playerIndex].total -= amount
             this.players[playerIndex].totalInPot += amount
         },
-
+        /**
+         * player calls the pot using bet
+         * @param {*} playerIndex - player to bet 
+         */
         call: function(playerIndex){
             var maxTotalInPot = this.maxTotalInPot(playerIndex)
             var amount = maxTotalInPot - this.players[playerIndex].totalInPot
             this.bet(amount,playerIndex)
         },
-
+        /**
+         * helper function to indicate how much a player owes to call
+         * @param {*} playerIndex - player to call
+         * @returns $
+         */
         maxTotalInPot: function(playerIndex){
             var maxTotalInPot = 0
             for(var i=0;i<this.players.length;i++){
@@ -162,34 +200,49 @@ export function pokerlogic(){
 
     }
     
-    /// UI
-    var uiVar = {stepClicks:0,stepFuse:false,checkFlopToggle:false,peekCardsToggle:false}
+    /// UI object used by webGL to trigger animations
+    var uiVar = {
+        stepClicks:0, // state of round -> 0=rest , 1=deal , 2=flopping, 3=fflop, 4=turning, 5=fturn, 6=rivering, 7=friver
+        stepFuse:false, // flags to webGL an new state
+        checkFlopToggle:false, // flags to webGL to change camera
+        peekCardsToggle:false // flags to webGL to change camera
+    }
 
     document.addEventListener('DOMContentLoaded', function(event){
         _mainPokerLogic();
     });
-
+    /**
+     * runs when document is ready - setup ui
+     */
     function _mainPokerLogic(){
         setupUIEvents()
         renderUI()
     };
-
+    /**
+     * event when deal btn is clicked
+     */
     function dealClicked(){
         uiVar.stepClicks = 1
         uiVar.stepFuse = true
         renderUI()
     }
-
+    /**
+     * event when check flop btn is clicked
+     */
     function checkFlopClicked(){
         uiVar.checkFlopToggle = !uiVar.checkFlopToggle
         uiVar.peekCardsToggle = false
     }
-
+    /**
+     * event when peek btn is clicked
+     */
     function peekCardsClicked(){
         uiVar.peekCardsToggle = !uiVar.peekCardsToggle
         uiVar.checkFlopToggle = false
     }
-
+    /**
+     * event when fold btn is clicked
+     */
     function foldClicked(){
         gameVar.players[gameVar.currentPlayerIndex].isIn = false
         var nextActionData = gameVar.nextAction()
@@ -202,7 +255,9 @@ export function pokerlogic(){
         }
         renderUI()
     }
-
+    /**
+     * event when check btn is clicked
+     */
     function checkClicked(){
         var nextActionData = gameVar.nextAction()
         gameVar.currentPlayerIndex = nextActionData.index
@@ -214,7 +269,9 @@ export function pokerlogic(){
         }
         renderUI()
     }
-
+    /**
+     * event when call btn is clicked
+     */
     function callClicked(){
         gameVar.call(gameVar.currentPlayerIndex)
         var nextActionData = gameVar.nextAction()
@@ -227,10 +284,13 @@ export function pokerlogic(){
         }
         renderUI()
     }
-
+    /**
+     * event when raise btn is clicked
+     */
     function raiseClicked(){
         var raiseInputValue = document.getElementById('raise-input').value
         raiseInputValue = Number(raiseInputValue)
+        // invalid raise
         if(!raiseInputValue || isNaN(raiseInputValue)){
             return
         }
@@ -242,7 +302,9 @@ export function pokerlogic(){
         }
         renderUI()
     }
-
+    /**
+     * connects ui elements to their event functions
+     */
     function setupUIEvents(){
         uiVar['deal-button'] = document.getElementById('deal-button');
         uiVar['deal-button'].addEventListener('click',dealClicked)
@@ -265,12 +327,15 @@ export function pokerlogic(){
         uiVar['raise-button'] = document.getElementById('raise-button');
         uiVar['raise-button'].addEventListener('click',raiseClicked)
     }
-
+    /**
+     * re-renders player table
+     */
     function uiTableUpdate(){
         var table = document.createElement('table')
         var theader = table.createTHead()
         var theaderRow = theader.insertRow()
         var tbody = table.createTBody()
+        // headers
         var properties = [
             {id:'position',label:'P#'},
             {id:'total',label:'$stack'},
@@ -280,11 +345,13 @@ export function pokerlogic(){
             var hr = theaderRow.insertCell()
             hr.innerHTML = properties[j].label
         }
-        var hr = theaderRow.insertCell()
+        var hr = theaderRow.insertCell() // hand
         hr.innerHTML = 'hand'
+        // player rows
         for(var i=0;i<gameVar.players.length;i++){
             if(gameVar.players[i].isIn){
                 var tr = tbody.insertRow()
+                // current player
                 if(i===gameVar.currentPlayerIndex){
                     tr.classList.add('table-row-current-player') 
                 }
@@ -292,13 +359,17 @@ export function pokerlogic(){
                     var td = tr.insertCell()
                     td.innerHTML = gameVar.players[i][properties[j].id]
                 }
+                // hand
                 var td = tr.insertCell()
                 td.innerHTML = gameVar.players[i].handToString()
             }
         }
         $("#data-table").html(table)
     }
-
+    /**
+     * re-renders table and UI elements
+     * also handels when UI is disabled
+     */
     function renderUI(){
         uiVar['deal-button'].disabled = uiVar.stepClicks >= 1
 

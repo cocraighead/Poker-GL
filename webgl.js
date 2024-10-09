@@ -3,6 +3,10 @@ var gameObject
 
 var imagesFolder = 'textures/'
 
+/**
+ * setup needed before drawing scene
+ * @param {*} pokerlogicInstance - UI and Game Object
+ */
 function __main__(pokerlogicInstance){
     uiObject = pokerlogicInstance.uiVar
     gameObject = pokerlogicInstance.gameVar
@@ -2744,8 +2748,8 @@ function webGLStart(images)
       gl.uniformMatrix4fv(gl.getUniformLocation(prog,"ProjectionMatrix") , false , ProjectionMatrix.getMat());
       gl.uniformMatrix4fv(gl.getUniformLocation(prog,"ViewMatrix")  , false , ViewMatrix.getMat());
 
-      previousAnimationState = animationState
-
+      previousAnimationState = animationState // save last animation state
+      // check for new state from UI
       if(uiObject.stepFuse){
          animationState = uiObject.stepClicks
          uiObject.stepFuse = false
@@ -2754,6 +2758,7 @@ function webGLStart(images)
          }
          gameObject.run(uiObject.stepClicks)
       }else{
+         // else use next state set by last draw
          animationState = nextAnimationState
       }
 
@@ -2880,6 +2885,8 @@ function webGLStart(images)
 }
 
 // seems like it lags the scene
+// draw a box highlighting something in the scene
+// takes that objects matrix so the location size and rotion can match
 function drawBoxHighlight(ModelviewMatrix,tex,bufferAsArray){
    // calulate box expansion
    // get max x,y,z of data buffer
@@ -2935,16 +2942,7 @@ function drawBoxHighlight(ModelviewMatrix,tex,bufferAsArray){
     gl.disableVertexAttribArray(T2D);
 }
 
-function getCardTexture(faceUp, suite, cardNumber, texturesDict){
-   if(!faceUp){
-      var texObject = texturesDict[imagesFolder+'double_card_back.png']
-      return texObject ? texObject.tex : {}
-   }
-
-   var texObject = texturesDict[imagesFolder+'card_'+suite+cardNumber+'.png']
-   return texObject ? texObject.tex : {}
-}
-
+// draws a street card fliping 180 to be face up
 function drawFlippingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,texturesDict,suite,cardNumber,now,horizontal){
    var posObj = horizontal ? flipCardHorizontalPosition(x,ySit,z,now) : flipCardVerticalPosition(x,ySit,z,now)
    gl.bindTexture(gl.TEXTURE_2D,getCardTexture(faceUp,suite,cardNumber,texturesDict))
@@ -2982,7 +2980,7 @@ function drawFlippingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,text
    gl.disableVertexAttribArray(RGB);
    gl.disableVertexAttribArray(T2D);
 }
-   
+// draws card moving in a staight line - street cards and deal cards
 function drawMovingCard(faceUp,spinning,endYAngle,ySit,x1,z1,x2,z2,ModelviewMatrix,tex,time){
     gl.bindTexture(gl.TEXTURE_2D,tex)
     //  Bind cube buffer
@@ -3021,7 +3019,7 @@ function drawMovingCard(faceUp,spinning,endYAngle,ySit,x1,z1,x2,z2,ModelviewMatr
     gl.disableVertexAttribArray(RGB);
     gl.disableVertexAttribArray(T2D);
 } 
-
+   // draw a card staying still and flat - use by street cards and hands
    function drawCard(faceUp,x,z,ySit,rotation,ModelviewMatrix, textures, texturesDict, suite, cardNumber){
     
     gl.bindTexture(gl.TEXTURE_2D,getCardTexture(faceUp,suite,cardNumber,texturesDict))
@@ -3059,7 +3057,7 @@ function drawMovingCard(faceUp,spinning,endYAngle,ySit,x1,z1,x2,z2,ModelviewMatr
     gl.disableVertexAttribArray(RGB);
     gl.disableVertexAttribArray(T2D);
 }
-
+// draws cards bent up so user can see their values
 function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,texturesDict,suite,cardNumber){
     
    gl.bindTexture(gl.TEXTURE_2D,getCardTexture(faceUp,suite,cardNumber,texturesDict))
@@ -3096,6 +3094,12 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,textu
    gl.disableVertexAttribArray(NORM);
    gl.disableVertexAttribArray(RGB);
    gl.disableVertexAttribArray(T2D);
+}
+// draws three flop cards after they are flipped
+function drawFlop(xs,ModelviewMatrix,textures,texturesDict,gameBoard){
+   drawCard(true,xs.a+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[0].suite,gameBoard[0].number)
+   drawCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[1].suite,gameBoard[1].number)
+   drawCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[2].suite,gameBoard[2].number)         
 }
 
    function drawTable(ModelviewMatrix,tex){
@@ -3134,7 +3138,7 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,textu
         gl.disableVertexAttribArray(RGB);
         gl.disableVertexAttribArray(T2D);
    }
-
+   // flips card along a half circle - flips over long side - flop 
    function flipCardHorizontalPosition(cardX,cardY,cardZ,now){
       var ret = {}
 
@@ -3148,7 +3152,7 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,textu
       ret.delta = (((now*180) % 180)*-1)+180
       return ret
    }
-
+   // flips card along a half circle - flips over short side - turn & river
    function flipCardVerticalPosition(cardX,cardY,cardZ,now){
       var ret = {}
 
@@ -3216,12 +3220,7 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,textu
       drawMovingCard(false,false,0,0,-.9,0,xs.c,0,ModelviewMatrix,textures[1],now)
    }
 
-   function drawFlop(xs,ModelviewMatrix,textures,texturesDict,gameBoard){
-      drawCard(true,xs.a+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[0].suite,gameBoard[0].number)
-      drawCard(true,xs.b+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[1].suite,gameBoard[1].number)
-      drawCard(true,xs.c+.3,0,0,0,ModelviewMatrix,textures,texturesDict,gameBoard[2].suite,gameBoard[2].number)         
-   }
-
+   // get players cards position
    function getPlayersPos(numPlayers){
       var tableCenterX = 0 
       var tableCenterZ = 0 
@@ -3251,7 +3250,7 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,textu
       }
       return pos
    }
-
+   // get position behind players cards
    function getPlayersEyes(numPlayers,playerNumber){
       var tableCenterX = 0 
       var tableCenterZ = 0
@@ -3266,20 +3265,30 @@ function drawPeakingCard(faceUp,x,z,ySit,rotation,ModelviewMatrix,textures,textu
       pos.z = Math.sin(angle*(Math.PI/180))*r + tableCenterZ
       return pos
    }
-
+   // rotation for spiining cards - deal animation
    function rotation(currentTime, endAngle){
     // var endAngle = 20
     var currentEnd = 280
     var offSet = endAngle - currentEnd
     return (currentTime*1000%360) + offSet; //0-1
    }
-
+   // position for card moving in a strait line - 2D b/c y is constant
    function straitLine(currentTime,xStart,zStart,xEnd,zEnd){
        var localTime = (currentTime*1000%1000)/1000; //0-1
        var currentX = xStart + (xEnd-xStart)*localTime
        var currentZ = zStart + (zEnd-zStart)*localTime
        return {x:currentX,z:currentZ}
       
+   }
+
+   function getCardTexture(faceUp, suite, cardNumber, texturesDict){
+      if(!faceUp){
+         var texObject = texturesDict[imagesFolder+'double_card_back.png']
+         return texObject ? texObject.tex : {}
+      }
+   
+      var texObject = texturesDict[imagesFolder+'card_'+suite+cardNumber+'.png']
+      return texObject ? texObject.tex : {}
    }
 
    function _each(objectX, callback){
