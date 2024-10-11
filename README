@@ -9,16 +9,9 @@ Colin Craighead
  TODO:
  -- get better a blender...
 
- Organize code - Try to create so classes 
- Comment code
- Fix animation cycle
  viewing tools
- Finish bent card
- Create more card textures
- Draw card with it's correct texture
  Make ui look good
- Define bet and turn rules
- Fill out UI for all needed moves
+ error message pop ups
  Draw chips - differnt pile sizes
  Define poker rules
  Implement rules

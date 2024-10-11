@@ -1,10 +1,10 @@
 import {Card} from './Card.js'
 
 export class Player  {
-    constructor(position) {
+    constructor(id) {
         this.hand = []; // card[]
 
-        this.position = position
+        this.id = id
         this.isIn = true // is in this round
         this.total = 100 // $ total
         this.totalInPot = 0 // $ total in pot

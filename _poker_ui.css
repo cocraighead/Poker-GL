@@ -40,6 +40,10 @@
     border: 1px solid rgb(227, 220, 88)ca;
 }
 
+.raise-button:disabled{
+    background-color: rgb(208, 219, 208);
+}
+
 .green-button{
     background-color: green;
     border: 1px solid black;
@@ -54,4 +58,8 @@
     width: 60%;
     margin: 24px;
     height: 20px;
+}
+
+.green-button:disabled{
+    background-color: rgb(208, 219, 208);
 }

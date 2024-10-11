@@ -24,6 +24,7 @@ export function pokerlogic(){
                 )
             }
             this.board = []
+            this.summaryMessage = 'Welcome to a new game of poker gl'
             this.setUpRound()
         },
         /**
@@ -38,8 +39,8 @@ export function pokerlogic(){
             // game 
             this.deck = new Deck(this.suites,this.cardNumbersStart,this.cardNumbersEnd)
             this.deck.shuffle(1)
-            this.dealerIndex = this.dealerIndex ? (this.dealerIndex+1)%this.numberOfPlayers : 0
-            this.pot = 0
+            this.dealerIndex = this.dealerIndex !== undefined ? (this.dealerIndex+1)%this.numberOfPlayers : 0
+            this.potTotal = 0
             for(var i=0;i<this.numberOfPlayers;i++){
                 this.players[i].hand = []
                 this.players[i].isIn = true
@@ -64,6 +65,26 @@ export function pokerlogic(){
             for(var i=0;i<this.numberOfPlayers;i++){
                 this.players[i].firstTurnOnStreet = true
             }
+        },
+        /**
+         * When round ends determines winner and pays them out
+         */
+        endRoundPayout: function(){
+            // loop through players who are in and find the best hand
+            var winningPlayer = undefined
+            var playersIn = []
+            for(var i=0;i<this.players.length;i++){
+                if(this.players[i].isIn){
+                    playersIn.push(this.players[i])
+                }
+            }
+            if(playersIn.length == 1){
+                winningPlayer = playersIn[0]
+            }else{
+                winningPlayer = playersIn[0]
+            }
+            winningPlayer.total += this.potTotal
+            this.summaryMessage = 'Player #' + winningPlayer.id + ' won $' + this.potTotal + ' with ' + winningPlayer.handToString()
         },
         /**
          * gives each player 2 cards from deck
@@ -106,6 +127,16 @@ export function pokerlogic(){
             if(numPlayersIn===1){
                 return {index:this.currentPlayerIndex,newStreet:false,newRound:true}
             }
+            // all players are all in - run out
+            var playersWithMoneyBehind = 0
+            for(var i=0;i<this.numberOfPlayers;i++){
+                if(this.players[i].isIn && this.players[i].total > 0){
+                    playersWithMoneyBehind += 1
+                }
+            }
+            if(playersWithMoneyBehind <= 1){
+                return 
+            }
             // next action
             for(var i=0;i<this.numberOfPlayers-1;i++){
                 var iPlayer = (this.currentPlayerIndex+i+1)%this.numberOfPlayers
@@ -123,7 +154,14 @@ export function pokerlogic(){
             for(var i=0;i<this.numberOfPlayers;i++){
                 var iPlayer = (this.dealerIndex+i+1)%this.numberOfPlayers
                 if(this.players[iPlayer].isIn){
-                    return {index:iPlayer,newStreet:true,newRound:false}
+                    // no street after the river so next round
+                    if(uiVar.stepClicks == 6){
+                        // next round
+                        return {index:this.currentPlayerIndex,newStreet:false,newRound:true}
+                    }else{
+                        // next street
+                        return {index:iPlayer,newStreet:true,newRound:false}
+                    }
                 }
             }
         },
@@ -158,8 +196,6 @@ export function pokerlogic(){
                 this.burnAndTurn(1,1)
             }else if(stepClicks === 6){
                 this.burnAndTurn(1,1)
-            }else if(stepClicks === -1){
-                this.setUpGame()
             }
             renderUI()
         },
@@ -171,6 +207,7 @@ export function pokerlogic(){
         bet: function(amount,playerIndex){
             this.players[playerIndex].total -= amount
             this.players[playerIndex].totalInPot += amount
+            this.potTotal += amount
         },
         /**
          * player calls the pot using bet
@@ -251,6 +288,7 @@ export function pokerlogic(){
             gameVar.nextStreet()
         }
         if(nextActionData.newRound){
+            gameVar.endRoundPayout()
             gameVar.setUpRound()
         }
         renderUI()
@@ -265,6 +303,7 @@ export function pokerlogic(){
             gameVar.nextStreet()
         }
         if(nextActionData.newRound){
+            gameVar.endRoundPayout()
             gameVar.setUpRound()
         }
         renderUI()
@@ -280,9 +319,35 @@ export function pokerlogic(){
             gameVar.nextStreet()
         }
         if(nextActionData.newRound){
+            gameVar.endRoundPayout()
             gameVar.setUpRound()
         }
         renderUI()
+    }
+    /**
+     * Validates the attempted raise
+     */
+    function validRaise(raiseInputValue){
+        // invalid type
+        if(!raiseInputValue || isNaN(raiseInputValue)){
+            return false
+        }
+        // invalid amount
+        if(raiseInputValue <= 0){
+            return false
+        }
+        var maxTotalInPot = gameVar.maxTotalInPot(gameVar.currentPlayerIndex)
+        var currentPlayerTotalInPot = gameVar.players[gameVar.currentPlayerIndex].totalInPot
+        var maxTotalDiff = maxTotalInPot - currentPlayerTotalInPot
+        // must be a true raise 
+        if(maxTotalDiff < 0){
+            alert('Raiseing on your own raise. This should not occur')
+            return false
+        }else if(raiseInputValue < maxTotalDiff){
+            // raise is less than other's raises
+            return false
+        }
+        return true
     }
     /**
      * event when raise btn is clicked
@@ -290,9 +355,8 @@ export function pokerlogic(){
     function raiseClicked(){
         var raiseInputValue = document.getElementById('raise-input').value
         raiseInputValue = Number(raiseInputValue)
-        // invalid raise
-        if(!raiseInputValue || isNaN(raiseInputValue)){
-            return
+        if(!validRaise(raiseInputValue)){
+            return false
         }
         gameVar.bet(raiseInputValue,gameVar.currentPlayerIndex)
         var nextActionData = gameVar.nextAction()
@@ -337,7 +401,7 @@ export function pokerlogic(){
         var tbody = table.createTBody()
         // headers
         var properties = [
-            {id:'position',label:'P#'},
+            {id:'id',label:'P#'},
             {id:'total',label:'$stack'},
             {id:'totalInPot',label:'$inPot'}
         ]
@@ -358,6 +422,10 @@ export function pokerlogic(){
                 for(var j=0;j<properties.length;j++){
                     var td = tr.insertCell()
                     td.innerHTML = gameVar.players[i][properties[j].id]
+                    // dealer
+                    if(i===gameVar.dealerIndex && properties[j].id === 'id'){
+                        td.innerHTML += '<sub>d</sub>'
+                    }
                 }
                 // hand
                 var td = tr.insertCell()
@@ -365,6 +433,13 @@ export function pokerlogic(){
             }
         }
         $("#data-table").html(table)
+    }
+    /**
+     * re-renders summary data on ui like pot total
+     */
+    function uiSummaryDataUpdate(){
+        $("#summary-message").html(gameVar.summaryMessage)
+        $("#pot-total").html('$'+gameVar.potTotal)
     }
     /**
      * re-renders table and UI elements
@@ -387,6 +462,7 @@ export function pokerlogic(){
 
         uiVar['raise-button'].disabled = uiVar.stepClicks < 1
 
+        uiSummaryDataUpdate()
         uiTableUpdate()
     }
 
