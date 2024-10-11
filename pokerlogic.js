@@ -37,6 +37,7 @@ export function pokerlogic(){
             uiVar.peekCardsToggle = false
             uiVar.stepFuse = true
             // game 
+            this.runOutFuse = false
             this.deck = new Deck(this.suites,this.cardNumbersStart,this.cardNumbersEnd)
             this.deck.shuffle(1)
             this.dealerIndex = this.dealerIndex !== undefined ? (this.dealerIndex+1)%this.numberOfPlayers : 0
@@ -134,8 +135,16 @@ export function pokerlogic(){
                     playersWithMoneyBehind += 1
                 }
             }
-            if(playersWithMoneyBehind <= 1){
-                return 
+            if(playersWithMoneyBehind === 0){
+                // no street after the river so next round
+                if(uiVar.stepClicks == 6){
+                    // next round
+                    return {index:this.currentPlayerIndex,newStreet:false,newRound:true}
+                }else{
+                    // next street - but run out to river
+                    this.runOutFuse = true
+                    return {index:this.currentPlayerIndex,newStreet:true,newRound:false}
+                } 
             }
             // next action
             for(var i=0;i<this.numberOfPlayers-1;i++){
@@ -196,6 +205,11 @@ export function pokerlogic(){
                 this.burnAndTurn(1,1)
             }else if(stepClicks === 6){
                 this.burnAndTurn(1,1)
+            }
+            // players are all in so they are really just checking all the way
+            if(this.runOutFuse){
+                // run slowly so we see it
+                setTimeout(()=>{checkClicked()}, 4000)
             }
             renderUI()
         },
@@ -347,6 +361,10 @@ export function pokerlogic(){
             // raise is less than other's raises
             return false
         }
+        // can go negitive on a raise
+        if(gameVar.players[gameVar.currentPlayerIndex].total < raiseInputValue){
+            return false
+        }
         return true
     }
     /**
@@ -453,14 +471,16 @@ export function pokerlogic(){
         uiVar['peek-cards-button'].disabled = uiVar.stepClicks < 1
 
         uiVar['check-button'].disabled = uiVar.stepClicks < 1 ||
+            gameVar.runOutFuse ||
             gameVar.players[gameVar.currentPlayerIndex].totalInPot < gameVar.maxTotalInPot(gameVar.currentPlayerIndex)
         
-        uiVar['fold-button'].disabled = uiVar.stepClicks < 1
+        uiVar['fold-button'].disabled = uiVar.stepClicks < 1 || gameVar.runOutFuse
 
         uiVar['call-button'].disabled = uiVar.stepClicks < 1 ||
+            gameVar.runOutFuse ||
             gameVar.players[gameVar.currentPlayerIndex].totalInPot >= gameVar.maxTotalInPot(gameVar.currentPlayerIndex)
 
-        uiVar['raise-button'].disabled = uiVar.stepClicks < 1
+        uiVar['raise-button'].disabled = uiVar.stepClicks < 1 || gameVar.runOutFuse
 
         uiSummaryDataUpdate()
         uiTableUpdate()
