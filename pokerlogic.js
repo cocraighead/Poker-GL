@@ -126,7 +126,7 @@ export function pokerlogic(){
                 winningPlayers[i].total += splitWinnings // no rounding
                 this.summaryMessage +=
                     'Player #' + winningPlayers[i].id + ' won $' + splitWinnings +
-                    ' with ' + winningPlayers[i].handToString() + ' (' + winningHandType + '). '
+                    ' with ' + winningPlayers[i].handToHtmlString() + ' (' + winningHandType + '). '
             }
         },
         /**
@@ -839,7 +839,7 @@ export function pokerlogic(){
                 }
                 // hand
                 var td = tr.insertCell()
-                td.innerHTML = gameVar.players[i].handToString()
+                td.innerHTML = gameVar.players[i].handToHtmlString()
                 var td = tr.insertCell()
                 if(gameVar.players[i].hand.length){
                     var handStrength = gameVar.getHandStrength(gameVar.players[i].hand,gameVar.board)

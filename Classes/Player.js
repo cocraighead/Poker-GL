@@ -21,4 +21,15 @@ export class Player  {
         }
         return handStr
     }
+    /**
+     * hand to string for html - uses icons instead of chars
+     * @returns 
+     */
+    handToHtmlString(){
+        var handStr = ''
+        if(this.hand.length){
+            handStr += this.hand[0].toHtmlString() + ',' + this.hand[1].toHtmlString()
+        }
+        return handStr
+    }
 }

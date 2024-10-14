@@ -69,3 +69,32 @@
 .green-button:disabled{
     background-color: rgb(208, 219, 208);
 }
+
+.i-span-club{
+    display: inline-block;
+    background-image: url('./assets/club_icon.png');
+    background-size: .8em;
+    width: .8em;
+    height: .8em;
+}
+.i-span-diamond{
+    display: inline-block;
+    background-image: url('./assets/diamond_icon.png');
+    background-size: .8em;
+    width: .8em;
+    height: .8em;
+}
+.i-span-heart{
+    display: inline-block;
+    background-image: url('./assets/heart_icon.png');
+    background-size: .8em;
+    width: .8em;
+    height: .8em;
+}
+.i-span-spade{
+    display: inline-block;
+    background-image: url('./assets/spade_icon.png');
+    background-size: .8em;
+    width: .8em;
+    height: .8em;
+}
