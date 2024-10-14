@@ -113,7 +113,7 @@ function webGLStart(images)
    canvas = document.getElementById("canvas");
    //  Select canvas size
    var size = Math.min(window.innerWidth,window.innerHeight)-10;
-   canvas.width  = window.innerWidth - 210;
+   canvas.width  = window.innerWidth - 260;
    canvas.height = window.innerHeight - 10;
    var xStart = (canvas.width - 2*size) / 2;
    //  Start WebGL
@@ -3315,7 +3315,7 @@ function drawFlop(xs,ModelviewMatrix,textures,texturesDict,gameBoard){
    canvas.resize = function ()
    {
       var size = Math.min(window.innerWidth, window.innerHeight)-10;
-      canvas.width  = canvas.width  = window.innerWidth - 210;
+      canvas.width  = canvas.width  = window.innerWidth - 260;
       canvas.height = canvas.height = window.innerHeight - 10;
       var xStart =  (canvas.width - 2*size) / 2;
       gl.viewport(xStart,0,size*2,size);

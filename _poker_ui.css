@@ -4,10 +4,16 @@
 }
 
 .ui-wrapper{
-    width: 200px;
+    width: 250px;
     display:flex;
     flex-direction: column;
+    align-items: center;
     background-color: rgb(213, 213, 213);
+}
+
+.summary-message{
+    text-align: center;
+    margin: 6px;
 }
 
 .data-table-class table, th, td{
