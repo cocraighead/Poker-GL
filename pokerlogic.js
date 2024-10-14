@@ -402,26 +402,29 @@ export function pokerlogic(){
         findStraight: function(handAndboard,straightLength){
             // sort decending
             handAndboard.sort(Card.compare).reverse()
+            // remove duplicates in place
+            for(var i=0;i<handAndboard.length;i++){
+                var lastDuplicateIndex = -1
+                for(var j=i+1;j<handAndboard.length;j++){
+                    if(handAndboard[i].number === handAndboard[j].number){
+                        lastDuplicateIndex = j
+                    }
+                }
+                if(lastDuplicateIndex >= 0){
+                    // remove all but first occurance
+                    handAndboard.splice(i+1, lastDuplicateIndex-i)
+                }
+            }
             var straightStartIndex = -1
             // check if cards are the correct spacing
             // for example [A,Q,J,10,9,8,6,4] Q(i=1) and 8(i=5) are 4 apart in index and value
-            // Edge case   [A,Q,J,J',9,8,6,4] Q(i=1) and 8(i=5) are 4 apart in index and value, but theres repeats
+            // this algo assumes that there are no repeats and the array is sorted
             for(var i=0;i<=handAndboard.length-straightLength;i++){
                 if(
                     straightStartIndex < 0 &&
                     (handAndboard[i].number - handAndboard[i+straightLength-1].number) === straightLength-1
                 ){
-                    var repeatsFlag = false
-                    var repeatDictionary = {}
-                    for(var j=i;j<=i+straightLength-1;j++){
-                        if(repeatDictionary[handAndboard[j].number]){
-                            repeatsFlag = true
-                        }
-                        repeatDictionary[handAndboard[j].number] = true
-                    }
-                    if(!repeatsFlag){
-                        straightStartIndex = i
-                    }
+                    straightStartIndex = i
                 }
             }
             return straightStartIndex
@@ -511,9 +514,7 @@ export function pokerlogic(){
             if(straightFlushStartIndex >= 0){
                 ret.handStrength = 8
                 ret.name = 'straight flush'
-                for(var i=straightFlushStartIndex;i<straightFlushStartIndex+straightLength;i++){
-                    ret.tiebreaks[i] = handAndboard_8[i].number
-                }
+                ret.tiebreaks[0] = handAndboard_8[0].number // top card of the straight is the only tie break we need
                 return ret
             }
             // 7 - quads
@@ -553,9 +554,7 @@ export function pokerlogic(){
             if(straightStartIndex >= 0){
                 ret.handStrength = 4
                 ret.name = 'straight'
-                for(var i=straightStartIndex;i<straightStartIndex+straightLength;i++){
-                    ret.tiebreaks[i] = handAndboard_4[i].number
-                }
+                ret.tiebreaks[0] = handAndboard_4[0].number // top card of the straight is the only tie break we need
                 return ret
             }
             // 3 - trips
