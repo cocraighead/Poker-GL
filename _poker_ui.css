@@ -21,7 +21,11 @@
     border: 1px solid black;
 }
 
-.table-row-current-player{
+.table-row-server-player{
+    border: thick, solid, green;
+}
+
+.table-row-local-player{
     font-weight: bold;
 }
 

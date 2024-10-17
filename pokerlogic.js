@@ -1,6 +1,7 @@
 import {Deck} from './Classes/Deck.js'
 import {Player} from './Classes/Player.js'
 import {Card} from './Classes/Card.js'
+import {Template} from './Classes/Template.js'
 
 export function pokerlogic(){
     // Game Object
@@ -12,16 +13,21 @@ export function pokerlogic(){
         numberOfPlayers: 5,
         smallBlind: 1,
         bigBlind: 3,
+        localPlayerIndex: -1,
         
         /**
          * sets up a new games values
          */
         setUpGame: function(){
+            this.localPlayerIndex = 0
             this.players = []
             for(var i=0;i<this.numberOfPlayers;i++){
                 this.players.push(
                     new Player(i)
                 )
+                if(i == this.localPlayerIndex){
+                    this.players[i].name = 'Me'
+                }
             }
             this.summaryMessage = 'Welcome to a new game of poker gl'
             this.setUpRound()
@@ -50,11 +56,11 @@ export function pokerlogic(){
             // blinds and first action
             if(this.numberOfPlayers === 2){
                 this.bet(this.bigBlind,(this.dealerIndex+1)%this.numberOfPlayers)
-                this.currentPlayerIndex = this.dealerIndex
+                this.serverPlayerIndex = this.dealerIndex
             }else{
                 this.bet(this.smallBlind,(this.dealerIndex+1)%this.numberOfPlayers)
                 this.bet(this.bigBlind,(this.dealerIndex+2)%this.numberOfPlayers)
-                this.currentPlayerIndex = (this.dealerIndex+3)%this.numberOfPlayers
+                this.serverPlayerIndex = (this.dealerIndex+3)%this.numberOfPlayers
             }
             this.setUpStreet()
         },
@@ -136,7 +142,7 @@ export function pokerlogic(){
         deal: function(){
             for(var n=0;n<2;n++){ // deal 2 cards
                 for(var i=0;i<this.players.length;i++){
-                    var iPlayer = (this.currentPlayerIndex+i)%this.players.length
+                    var iPlayer = (this.serverPlayerIndex+i)%this.players.length
                     this.players[iPlayer].hand.push(this.deck.cards.pop())
                 }
             }
@@ -168,7 +174,7 @@ export function pokerlogic(){
                 }
             }
             if(numPlayersIn===1){
-                return {index:this.currentPlayerIndex,newStreet:false,newRound:true}
+                return {index:this.serverPlayerIndex,newStreet:false,newRound:true}
             }
             // all players are all in - run out
             var playersWithMoneyBehind = 0
@@ -181,23 +187,23 @@ export function pokerlogic(){
                 // no street after the river so next round
                 if(uiVar.stepClicks == 6){
                     // next round
-                    return {index:this.currentPlayerIndex,newStreet:false,newRound:true}
+                    return {index:this.serverPlayerIndex,newStreet:false,newRound:true}
                 }else{
                     // next street - but run out to river
                     this.runOutFuse = true
-                    return {index:this.currentPlayerIndex,newStreet:true,newRound:false}
+                    return {index:this.serverPlayerIndex,newStreet:true,newRound:false}
                 } 
             }
             // next action
             for(var i=0;i<this.numberOfPlayers-1;i++){
-                var iPlayer = (this.currentPlayerIndex+i+1)%this.numberOfPlayers
+                var iPlayer = (this.serverPlayerIndex+i+1)%this.numberOfPlayers
                 if(
                     this.players[iPlayer].isIn && (
                         this.players[iPlayer].totalInPot < this.maxTotalInPot(iPlayer) ||
                         this.players[iPlayer].firstTurnOnStreet
                     )
                 ){
-                    this.players[this.currentPlayerIndex].firstTurnOnStreet = false
+                    this.players[this.serverPlayerIndex].firstTurnOnStreet = false
                     return {index:iPlayer,newStreet:false,newRound:false}
                 }
             }
@@ -208,7 +214,7 @@ export function pokerlogic(){
                     // no street after the river so next round
                     if(uiVar.stepClicks == 6){
                         // next round
-                        return {index:this.currentPlayerIndex,newStreet:false,newRound:true}
+                        return {index:this.serverPlayerIndex,newStreet:false,newRound:true}
                     }else{
                         // next street
                         return {index:iPlayer,newStreet:true,newRound:false}
@@ -645,7 +651,8 @@ export function pokerlogic(){
         stepClicks:0, // state of round -> 0=rest , 1=deal , 2=flopping, 3=fflop, 4=turning, 5=fturn, 6=rivering, 7=friver
         stepFuse:false, // flags to webGL an new state
         checkFlopToggle:false, // flags to webGL to change camera
-        peekCardsToggle:false // flags to webGL to change camera
+        peekCardsToggle:false, // flags to webGL to change camera
+        templates: []
     }
 
     document.addEventListener('DOMContentLoaded', function(event){
@@ -655,9 +662,25 @@ export function pokerlogic(){
      * runs when document is ready - setup ui
      */
     function _mainPokerLogic(){
+        var templates = ['guessCardModal']
+        for(var i=0;i<templates.length;i++){
+            uiVar.templates.push(new Template(templates[i]))
+        }
         setupUIEvents()
         renderUI()
     };
+    /**
+     * event to put test code in
+     */
+    function testEvent(){
+        console.log('ere')
+        // show hide template 0 
+        uiVar.templates[0].updateParameter('displayType','block')
+        uiVar.templates[0].render()
+    }
+    /**
+     * event when check flop btn is clicked
+     */
     /**
      * event when deal btn is clicked
      */
@@ -684,9 +707,9 @@ export function pokerlogic(){
      * event when fold btn is clicked
      */
     function foldClicked(){
-        gameVar.players[gameVar.currentPlayerIndex].isIn = false
+        gameVar.players[gameVar.serverPlayerIndex].isIn = false
         var nextActionData = gameVar.nextAction()
-        gameVar.currentPlayerIndex = nextActionData.index
+        gameVar.serverPlayerIndex = nextActionData.index
         if(nextActionData.newStreet){
             gameVar.nextStreet()
         }
@@ -701,7 +724,7 @@ export function pokerlogic(){
      */
     function checkClicked(){
         var nextActionData = gameVar.nextAction()
-        gameVar.currentPlayerIndex = nextActionData.index
+        gameVar.serverPlayerIndex = nextActionData.index
         if(nextActionData.newStreet){
             gameVar.nextStreet()
         }
@@ -715,9 +738,9 @@ export function pokerlogic(){
      * event when call btn is clicked
      */
     function callClicked(){
-        gameVar.call(gameVar.currentPlayerIndex)
+        gameVar.call(gameVar.serverPlayerIndex)
         var nextActionData = gameVar.nextAction()
-        gameVar.currentPlayerIndex = nextActionData.index
+        gameVar.serverPlayerIndex = nextActionData.index
         if(nextActionData.newStreet){
             gameVar.nextStreet()
         }
@@ -739,8 +762,8 @@ export function pokerlogic(){
         if(raiseInputValue <= 0){
             return false
         }
-        var maxTotalInPot = gameVar.maxTotalInPot(gameVar.currentPlayerIndex)
-        var currentPlayerTotalInPot = gameVar.players[gameVar.currentPlayerIndex].totalInPot
+        var maxTotalInPot = gameVar.maxTotalInPot(gameVar.serverPlayerIndex)
+        var currentPlayerTotalInPot = gameVar.players[gameVar.serverPlayerIndex].totalInPot
         var maxTotalDiff = maxTotalInPot - currentPlayerTotalInPot
         // must be a true raise 
         if(maxTotalDiff < 0){
@@ -751,7 +774,7 @@ export function pokerlogic(){
             return false
         }
         // can go negitive on a raise
-        if(gameVar.players[gameVar.currentPlayerIndex].total < raiseInputValue){
+        if(gameVar.players[gameVar.serverPlayerIndex].total < raiseInputValue){
             return false
         }
         return true
@@ -765,9 +788,9 @@ export function pokerlogic(){
         if(!validRaise(raiseInputValue)){
             return false
         }
-        gameVar.bet(raiseInputValue,gameVar.currentPlayerIndex)
+        gameVar.bet(raiseInputValue,gameVar.serverPlayerIndex)
         var nextActionData = gameVar.nextAction()
-        gameVar.currentPlayerIndex = nextActionData.index
+        gameVar.serverPlayerIndex = nextActionData.index
         if(nextActionData.newStreet){
             gameVar.nextStreet()
         }
@@ -777,6 +800,9 @@ export function pokerlogic(){
      * connects ui elements to their event functions
      */
     function setupUIEvents(){
+        uiVar['open-modal'] = document.getElementById('open-modal');
+        uiVar['open-modal'].addEventListener('click',testEvent)
+
         uiVar['deal-button'] = document.getElementById('deal-button');
         uiVar['deal-button'].addEventListener('click',dealClicked)
 
@@ -808,7 +834,7 @@ export function pokerlogic(){
         var tbody = table.createTBody()
         // headers
         var properties = [
-            {id:'id',label:'P#'},
+            {id:'name',label:'P#'},
             {id:'total',label:'$stack'},
             {id:'totalInPot',label:'$inPot'}
         ]
@@ -824,9 +850,12 @@ export function pokerlogic(){
         for(var i=0;i<gameVar.players.length;i++){
             if(gameVar.players[i].isIn){
                 var tr = tbody.insertRow()
-                // current player
-                if(i===gameVar.currentPlayerIndex){
-                    tr.classList.add('table-row-current-player') 
+                // server player
+                if(i===gameVar.serverPlayerIndex){
+                    tr.classList.add('table-row-server-player') 
+                }
+                if(i===gameVar.localPlayerIndex){
+                    tr.classList.add('table-row-local-player') 
                 }
                 for(var j=0;j<properties.length;j++){
                     var td = tr.insertCell()
@@ -870,13 +899,13 @@ export function pokerlogic(){
 
         uiVar['check-button'].disabled = uiVar.stepClicks < 1 ||
             gameVar.runOutFuse ||
-            gameVar.players[gameVar.currentPlayerIndex].totalInPot < gameVar.maxTotalInPot(gameVar.currentPlayerIndex)
+            gameVar.players[gameVar.serverPlayerIndex].totalInPot < gameVar.maxTotalInPot(gameVar.serverPlayerIndex)
         
         uiVar['fold-button'].disabled = uiVar.stepClicks < 1 || gameVar.runOutFuse
 
         uiVar['call-button'].disabled = uiVar.stepClicks < 1 ||
             gameVar.runOutFuse ||
-            gameVar.players[gameVar.currentPlayerIndex].totalInPot >= gameVar.maxTotalInPot(gameVar.currentPlayerIndex)
+            gameVar.players[gameVar.serverPlayerIndex].totalInPot >= gameVar.maxTotalInPot(gameVar.serverPlayerIndex)
 
         uiVar['raise-button'].disabled = uiVar.stepClicks < 1 || gameVar.runOutFuse
 
