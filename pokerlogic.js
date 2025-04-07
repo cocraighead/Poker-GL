@@ -30,6 +30,8 @@ export function pokerlogic(){
                 }
             }
             this.summaryMessage = 'Welcome to a new game of poker gl'
+            this.gameLogs = []
+            this.gameLogs.push(this.summaryMessage.repeat(1))
             this.setUpRound()
         },
         /**
@@ -134,6 +136,7 @@ export function pokerlogic(){
                     'Player #' + winningPlayers[i].id + ' won $' + splitWinnings +
                     ' with ' + winningPlayers[i].handToHtmlString() + ' (' + winningHandType + '). '
             }
+            this.gameLogs.push(this.summaryMessage.repeat(1))
         },
         /**
          * gives each player 2 cards from deck
@@ -662,7 +665,7 @@ export function pokerlogic(){
      * runs when document is ready - setup ui
      */
     function _mainPokerLogic(){
-        var templates = ['guessCardModal']
+        var templates = ['game-logs-modal']
         for(var i=0;i<templates.length;i++){
             uiVar.templates.push(new Template(templates[i]))
         }
@@ -672,11 +675,19 @@ export function pokerlogic(){
     /**
      * event to put test code in
      */
-    function testEvent(){
-        console.log('ere')
-        // show hide template 0 
-        uiVar.templates[0].updateParameter('displayType','block')
-        uiVar.templates[0].render()
+    function toggleGameLog(){
+        // show hide template  
+        if(!uiVar.templates[0].showing){
+            var joinedGameLogs = ''
+            for(var i=0;i<gameVar.gameLogs.length;i++){
+                joinedGameLogs += '<p>' + gameVar.gameLogs[i] + '</p>'
+            }
+            uiVar.templates[0].updateParameter('GAME_LOGS',joinedGameLogs)
+            uiVar.templates[0].render()
+        }else{
+            uiVar.templates[0].remove()
+        }
+
     }
     /**
      * event when check flop btn is clicked
@@ -800,8 +811,8 @@ export function pokerlogic(){
      * connects ui elements to their event functions
      */
     function setupUIEvents(){
-        uiVar['open-modal'] = document.getElementById('open-modal');
-        uiVar['open-modal'].addEventListener('click',testEvent)
+        uiVar['open-game-log'] = document.getElementById('open-game-log');
+        uiVar['open-game-log'].addEventListener('click',toggleGameLog)
 
         uiVar['deal-button'] = document.getElementById('deal-button');
         uiVar['deal-button'].addEventListener('click',dealClicked)

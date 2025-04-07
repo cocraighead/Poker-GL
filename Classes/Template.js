@@ -1,7 +1,7 @@
 var templates = {
-    'guessCardModal': {
-        string:'<div style="background-color: white; display: displayType; position: absolute; top: 100px; left: 110px; z-index:1;"> <div>hello world</div> </div>',
-        parameters: [{'name':'displayType','value':'none'}],
+    'game-logs-modal': {
+        string:'<div style="background-color: white; display: block; position: absolute; top: 100px; left: 110px; z-index:1;"><div style="display: flex; flex-direction: column;">GAME_LOGS</div></div>',
+        parameters: [{'name':'GAME_LOGS','value':''}],
     }
 }
 
@@ -11,11 +11,15 @@ export class Template  {
         this.templateString = templates[name].string
         this.templateParameters = templates[name].parameters
         this.showing = false
-        this.render()
     }
     render(){
         var fullTpl = this.insertParameters()
+        this.showing = true
         $("#"+this.name).html(fullTpl)
+    }
+    remove(){
+        this.showing = false
+        $("#"+this.name)[0].firstChild.remove()
     }
     updateParameter(name,value){
         for(var i=0;i<this.templateParameters.length;i++){
@@ -33,7 +37,7 @@ export class Template  {
     }
     insertParameter(newString,parameter){
         var startOfParam = newString.indexOf(parameter.name)
-        if(startOfParam == -1){return ''}
+        if(startOfParam == -1){return newString}
         return newString.substring(0,startOfParam) + parameter.value + newString.substring(startOfParam+String(parameter.name).length)
     }
 }
