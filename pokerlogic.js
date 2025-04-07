@@ -90,6 +90,7 @@ export function pokerlogic(){
             // loop through players who are in and find the best hand
             var winningPlayers = []
             var playersIn = []
+            var winningHandType = ''
             for(var i=0;i<this.players.length;i++){
                 if(this.players[i].isIn){
                     playersIn.push(this.players[i])
@@ -98,6 +99,8 @@ export function pokerlogic(){
             // one player in
             if(playersIn.length == 1){
                 winningPlayers.push(playersIn[0])
+                var oneWinnersHandStrength = this.getHandStrength(playersIn[0].hand,this.board)
+                winningHandType = oneWinnersHandStrength.name
             }else{ // find winner hand(s)
                 // get hand strength
                 var handStrengthDataArray = []
@@ -125,9 +128,9 @@ export function pokerlogic(){
                         winningPlayers.push(this.findPlayer(handStrengthDataArray[i].id))
                     }
                 }
+                winningHandType = handStrengthDataArray[0].handStrengthData.name
             }
             // pay player(s) and message winnings
-            var winningHandType = handStrengthDataArray[0].handStrengthData.name
             this.summaryMessage = ''
             for(var i=0;i<winningPlayers.length;i++){
                 var splitWinnings = this.potTotal / winningPlayers.length
