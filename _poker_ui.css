@@ -1,6 +1,90 @@
+body{
+    background-color: #052D17;   
+}
+
 .main-wrapper{
     display: flex;
-    background-color: black;
+    flex-direction: column;
+}
+
+.top-ui-row{
+    display: flex;
+    height: 15%;
+    justify-content: space-between;
+}
+
+.top-ui-row-btn-wrapper{
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #FFFFFF;
+}
+
+.flop-wrapper{
+    display: flex;
+}
+
+.center-ui-row{
+    display: flex;
+    height: 84%;
+}
+
+.side-ui-column{
+    display: flex;
+    flex-direction: column;
+    width: 15%;
+    justify-content: end;
+}
+
+.stack-wrapper{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.stack-logo-wrapper img{
+    width: 100%;
+}
+
+.stack-table-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 2px solid #FFFFFF;
+    color: #FFFFFF;
+}
+
+.stack-table-left{
+    border-right: 2px solid #FFFFFF;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.stack-table-right{
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.center-ui-column{
+    display: flex;
+    flex-direction: column;
+    width: 84%;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-ui-column-bottom-row{
+    display: flex;
+}
+
+.canvas-wrapper{
+    background-color: transparent;
+}
+
+.canvas{
+    border-radius: 800px;
 }
 
 .ui-wrapper{

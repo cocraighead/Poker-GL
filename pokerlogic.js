@@ -834,11 +834,11 @@ export function pokerlogic(){
         uiVar['deal-button'] = document.getElementById('deal-button');
         uiVar['deal-button'].addEventListener('click',dealClicked)
 
-        uiVar['check-flop-button'] = document.getElementById('check-flop-button');
-        uiVar['check-flop-button'].addEventListener('click',checkFlopClicked)
+        // uiVar['check-flop-button'] = document.getElementById('check-flop-button');
+        // uiVar['check-flop-button'].addEventListener('click',checkFlopClicked)
 
-        uiVar['peek-cards-button'] = document.getElementById('peek-cards-button');
-        uiVar['peek-cards-button'].addEventListener('click',peekCardsClicked)
+        // uiVar['peek-cards-button'] = document.getElementById('peek-cards-button');
+        // uiVar['peek-cards-button'].addEventListener('click',peekCardsClicked)
 
         uiVar['check-button'] = document.getElementById('check-button');
         uiVar['check-button'].addEventListener('click',checkClicked)
@@ -923,9 +923,9 @@ export function pokerlogic(){
     function renderUI(){
         uiVar['deal-button'].disabled = uiVar.stepClicks >= 1
 
-        uiVar['check-flop-button'].disabled = uiVar.stepClicks < 2
+        // uiVar['check-flop-button'].disabled = uiVar.stepClicks < 2
 
-        uiVar['peek-cards-button'].disabled = uiVar.stepClicks < 1
+        // uiVar['peek-cards-button'].disabled = uiVar.stepClicks < 1
 
         uiVar['check-button'].disabled = uiVar.stepClicks < 1 ||
             gameVar.runOutFuse ||
