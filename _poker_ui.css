@@ -102,3 +102,14 @@
     width: .8em;
     height: .8em;
 }
+
+.raise-error-message-show{
+    color: red;
+    background-color: rgb(255, 104, 104);
+    padding: 10px;
+    margin: 0px;
+}
+
+.raise-error-message-hide{
+    display: none;
+}

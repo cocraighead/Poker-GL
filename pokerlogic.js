@@ -50,6 +50,7 @@ export function pokerlogic(){
             this.deck.shuffle(1)
             this.dealerIndex = this.dealerIndex !== undefined ? (this.dealerIndex+1)%this.numberOfPlayers : 0
             this.potTotal = 0
+            this.raiseErrorMessage = ''
             for(var i=0;i<this.numberOfPlayers;i++){
                 this.players[i].hand = []
                 this.players[i].isIn = true
@@ -140,6 +141,9 @@ export function pokerlogic(){
                     ' with ' + winningPlayers[i].handToHtmlString() + ' (' + winningHandType + '). '
             }
             this.gameLogs.push(this.summaryMessage.repeat(1))
+        },
+        endAction: function(){
+            this.raiseErrorMessage = ''
         },
         /**
          * gives each player 2 cards from deck
@@ -723,6 +727,7 @@ export function pokerlogic(){
     function foldClicked(){
         gameVar.players[gameVar.serverPlayerIndex].isIn = false
         var nextActionData = gameVar.nextAction()
+        gameVar.endAction()
         gameVar.serverPlayerIndex = nextActionData.index
         if(nextActionData.newStreet){
             gameVar.nextStreet()
@@ -738,6 +743,7 @@ export function pokerlogic(){
      */
     function checkClicked(){
         var nextActionData = gameVar.nextAction()
+        gameVar.endAction()
         gameVar.serverPlayerIndex = nextActionData.index
         if(nextActionData.newStreet){
             gameVar.nextStreet()
@@ -754,6 +760,7 @@ export function pokerlogic(){
     function callClicked(){
         gameVar.call(gameVar.serverPlayerIndex)
         var nextActionData = gameVar.nextAction()
+        gameVar.endAction()
         gameVar.serverPlayerIndex = nextActionData.index
         if(nextActionData.newStreet){
             gameVar.nextStreet()
@@ -770,10 +777,12 @@ export function pokerlogic(){
     function validRaise(raiseInputValue){
         // invalid type
         if(!raiseInputValue || isNaN(raiseInputValue)){
+            gameVar.raiseErrorMessage = 'Raise must be a #'
             return false
         }
         // invalid amount
         if(raiseInputValue <= 0){
+            gameVar.raiseErrorMessage = 'Raise must be greater than 0'
             return false
         }
         var maxTotalInPot = gameVar.maxTotalInPot(gameVar.serverPlayerIndex)
@@ -781,16 +790,19 @@ export function pokerlogic(){
         var maxTotalDiff = maxTotalInPot - currentPlayerTotalInPot
         // must be a true raise 
         if(maxTotalDiff < 0){
-            alert('Raiseing on your own raise. This should not occur')
+            gameVar.raiseErrorMessage = 'Raiseing on your own raise. This should not occur'
             return false
         }else if(raiseInputValue < maxTotalDiff){
             // raise is less than other's raises
+            gameVar.raiseErrorMessage = 'Raise needs to be at least a call'
             return false
         }
         // can go negitive on a raise
         if(gameVar.players[gameVar.serverPlayerIndex].total < raiseInputValue){
+            gameVar.raiseErrorMessage = 'You cant raise more than you have'
             return false
         }
+        gameVar.raiseErrorMessage = ''
         return true
     }
     /**
@@ -800,10 +812,12 @@ export function pokerlogic(){
         var raiseInputValue = document.getElementById('raise-input').value
         raiseInputValue = Number(raiseInputValue)
         if(!validRaise(raiseInputValue)){
+            renderUI()
             return false
         }
         gameVar.bet(raiseInputValue,gameVar.serverPlayerIndex)
         var nextActionData = gameVar.nextAction()
+        gameVar.endAction()
         gameVar.serverPlayerIndex = nextActionData.index
         if(nextActionData.newStreet){
             gameVar.nextStreet()
@@ -837,6 +851,8 @@ export function pokerlogic(){
 
         uiVar['raise-button'] = document.getElementById('raise-button');
         uiVar['raise-button'].addEventListener('click',raiseClicked)
+
+        uiVar['raise-error-message'] = document.getElementById('raise-error-message')
     }
     /**
      * re-renders player table
@@ -922,6 +938,13 @@ export function pokerlogic(){
             gameVar.players[gameVar.serverPlayerIndex].totalInPot >= gameVar.maxTotalInPot(gameVar.serverPlayerIndex)
 
         uiVar['raise-button'].disabled = uiVar.stepClicks < 1 || gameVar.runOutFuse
+
+        uiVar['raise-error-message'].innerHTML = gameVar.raiseErrorMessage
+        if(gameVar.raiseErrorMessage){
+            uiVar['raise-error-message'].className = "raise-error-message-show"
+        }else{
+            uiVar['raise-error-message'].className = "raise-error-message-hide"
+        }
 
         uiSummaryDataUpdate()
         uiTableUpdate()

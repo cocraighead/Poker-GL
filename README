@@ -9,6 +9,9 @@ Colin Craighead
  TODO:
  -- get better a blender...
 
+ fix raise button. It needs to have min raise
+ fix call button, players can go negitive
+ fix setup round, players eliminnated still are in.
  open a modal that lets player guess thier openents cards. Click ops row and opens a modal (see note book drawing)   
  viewing tools
  Make ui look good
