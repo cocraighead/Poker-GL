@@ -11,6 +11,7 @@ body{
     display: flex;
     height: 15%;
     justify-content: space-between;
+    background-color: #031B0E;
 }
 
 .top-ui-row-btn-wrapper{
@@ -23,6 +24,7 @@ body{
 
 .flop-wrapper{
     display: flex;
+    width: 33%;
 }
 
 .center-ui-row{
@@ -35,6 +37,7 @@ body{
     flex-direction: column;
     width: 15%;
     justify-content: end;
+    background-color: #042412;
 }
 
 .stack-wrapper{
@@ -73,10 +76,13 @@ body{
     width: 84%;
     justify-content: center;
     align-items: center;
+    background-color: #052A15;
 }
 
 .center-ui-column-bottom-row{
     display: flex;
+    background-color: #031B0E;
+    width: 100%;
 }
 
 .canvas-wrapper{
@@ -100,9 +106,28 @@ body{
     margin: 6px;
 }
 
-.data-table-class table, th, td{
-    border-collapse: collapse;
-    border: 1px solid black;
+.players-wrapper{
+    display: flex;
+    flex-direction: column;
+    row-gap: 24px;
+    justify-content: center;
+    align-items: center;
+}
+
+.players-row{
+    background-color: #2D6A4F;
+    width: 84%;
+    display: flex;
+    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    row-gap: 4px;
+    padding: 10px;
+}
+
+.players-row-stat{
+    color: white;
 }
 
 .table-row-server-player{

@@ -31,6 +31,6 @@ export class Player  {
         if(this.hand.length){
             handStr += this.hand[0].toHtmlString() + ',' + this.hand[1].toHtmlString()
         }
-        return handStr
+        return '<p>' + handStr + '</p>'
     }
 }

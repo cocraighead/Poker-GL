@@ -834,11 +834,11 @@ export function pokerlogic(){
         uiVar['deal-button'] = document.getElementById('deal-button');
         uiVar['deal-button'].addEventListener('click',dealClicked)
 
-        // uiVar['check-flop-button'] = document.getElementById('check-flop-button');
-        // uiVar['check-flop-button'].addEventListener('click',checkFlopClicked)
+        uiVar['check-flop-button'] = document.getElementById('check-flop-button');
+        uiVar['check-flop-button'].addEventListener('click',checkFlopClicked)
 
-        // uiVar['peek-cards-button'] = document.getElementById('peek-cards-button');
-        // uiVar['peek-cards-button'].addEventListener('click',peekCardsClicked)
+        uiVar['peek-cards-button'] = document.getElementById('peek-cards-button');
+        uiVar['peek-cards-button'].addEventListener('click',peekCardsClicked)
 
         uiVar['check-button'] = document.getElementById('check-button');
         uiVar['check-button'].addEventListener('click',checkClicked)
@@ -858,56 +858,53 @@ export function pokerlogic(){
      * re-renders player table
      */
     function uiTableUpdate(){
-        var table = document.createElement('table')
-        var theader = table.createTHead()
-        var theaderRow = theader.insertRow()
-        var tbody = table.createTBody()
+        var playerStatsDiv = document.getElementById('player-stats');
+        playerStatsDiv.innerHTML = ''
         // headers
         var properties = [
             {id:'name',label:'P#'},
             {id:'total',label:'$stack'},
             {id:'totalInPot',label:'$inPot'}
         ]
-        for(var j=0;j<properties.length;j++){
-            var hr = theaderRow.insertCell()
-            hr.innerHTML = properties[j].label
-        }
-        var hr = theaderRow.insertCell() // hand
-        hr.innerHTML = 'cards'
-        var hr = theaderRow.insertCell() // hand
-        hr.innerHTML = 'hand'
         // player rows
         for(var i=0;i<gameVar.players.length;i++){
             if(gameVar.players[i].isIn){
-                var tr = tbody.insertRow()
+                var playerStatDiv = document.createElement('div')
+                playerStatDiv.classList.add('players-row') 
                 // server player
                 if(i===gameVar.serverPlayerIndex){
-                    tr.classList.add('table-row-server-player') 
+                    playerStatDiv.classList.add('table-row-server-player') 
                 }
                 if(i===gameVar.localPlayerIndex){
-                    tr.classList.add('table-row-local-player') 
+                    playerStatDiv.classList.add('table-row-local-player') 
                 }
                 for(var j=0;j<properties.length;j++){
-                    var td = tr.insertCell()
-                    td.innerHTML = gameVar.players[i][properties[j].id]
+                    var playerDataPointDiv = document.createElement('div')
+                    playerDataPointDiv.classList.add('players-row-stat') 
+                    playerDataPointDiv.innerHTML = gameVar.players[i][properties[j].id]
                     // dealer
                     if(i===gameVar.dealerIndex && properties[j].id === 'id'){
-                        td.innerHTML += '<sub>d</sub>'
+                        playerDataPointDiv.innerHTML += '<sub>d</sub>'
                     }
+                    playerStatDiv.append(playerDataPointDiv)
                 }
                 // hand
-                var td = tr.insertCell()
-                td.innerHTML = gameVar.players[i].handToHtmlString()
-                var td = tr.insertCell()
+                var playerHandDataPointDiv = document.createElement('div')
+                playerHandDataPointDiv.classList.add('players-row-stat') 
+                playerHandDataPointDiv.innerHTML = gameVar.players[i].handToHtmlString()
+                playerStatDiv.append(playerHandDataPointDiv)
+                var playerHandStrengthDataPointDiv = document.createElement('div')
+                playerHandStrengthDataPointDiv.classList.add('players-row-stat') 
                 if(gameVar.players[i].hand.length){
                     var handStrength = gameVar.getHandStrength(gameVar.players[i].hand,gameVar.board)
-                    td.innerHTML = handStrength.name
+                    playerHandStrengthDataPointDiv.innerHTML = handStrength.name
                 }else{
-                    td.innerHTML = ''
+                    playerHandStrengthDataPointDiv.innerHTML = ''
                 }
+                playerStatDiv.append(playerHandStrengthDataPointDiv)
+                playerStatsDiv.append(playerStatDiv)
             }
         }
-        $("#data-table").html(table)
     }
     /**
      * re-renders summary data on ui like pot total
@@ -923,9 +920,9 @@ export function pokerlogic(){
     function renderUI(){
         uiVar['deal-button'].disabled = uiVar.stepClicks >= 1
 
-        // uiVar['check-flop-button'].disabled = uiVar.stepClicks < 2
+        uiVar['check-flop-button'].disabled = uiVar.stepClicks < 2
 
-        // uiVar['peek-cards-button'].disabled = uiVar.stepClicks < 1
+        uiVar['peek-cards-button'].disabled = uiVar.stepClicks < 1
 
         uiVar['check-button'].disabled = uiVar.stepClicks < 1 ||
             gameVar.runOutFuse ||
