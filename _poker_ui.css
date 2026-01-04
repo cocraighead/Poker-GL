@@ -1,199 +1,181 @@
-body{
-    background-color: #052D17;   
+/* General Page Styling */
+body {
+    background-color: #052D17;
+    color: white;
+    font-family: sans-serif;
+    margin: 0;
+    overflow: hidden; /* Keeps the game contained in the viewport */
 }
 
-.main-wrapper{
+.main-wrapper {
     display: flex;
     flex-direction: column;
+    height: 100vh;
 }
 
-.top-ui-row{
+/* Header UI */
+.top-ui-row {
     display: flex;
-    height: 15%;
+    height: 10%;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid #2d6a4f;
+}
+
+/* Center Layout Split */
+.center-ui-row {
+    display: flex;
+    flex: 1;
+    height: 90%;
+}
+
+/* Side Columns for Players */
+.side-ui-column {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    gap: 15px;
     justify-content: space-between;
 }
 
-.top-ui-row-btn-wrapper{
-    width: 10%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #FFFFFF;
-}
-
-.flop-wrapper{
-    display: flex;
-}
-
-.center-ui-row{
-    display: flex;
-    height: 84%;
-}
-
-.side-ui-column{
+.players-wrapper {
     display: flex;
     flex-direction: column;
-    width: 15%;
-    justify-content: end;
+    gap: 12px;
 }
 
-.stack-wrapper{
+/* Player Cards */
+.player-card {
+    background: #1a4a31;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #2d6a4f;
+    transition: all 0.3s ease;
+}
+
+.player-card.active {
+    border-color: #f1c40f;
+    background: #2d6a4f;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.4);
+}
+
+.player-card.folded {
+    opacity: 0.5;
+    filter: grayscale(0.8);
+}
+
+.p-name { font-weight: bold; font-size: 1.1em; color: #f1c40f; }
+.p-stack { color: #bdc3c7; font-size: 0.9em; }
+.p-bet { color: #27ae60; font-weight: bold; height: 1.2em; }
+
+/* Center Game Area */
+.center-ui-column {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    position: relative;
 }
 
-.stack-logo-wrapper img{
+.canvas-wrapper {
+    flex: 1;
     width: 100%;
-}
-
-.stack-table-wrapper{
     display: flex;
     justify-content: center;
     align-items: center;
-    border-top: 2px solid #FFFFFF;
-    color: #FFFFFF;
 }
 
-.stack-table-left{
-    border-right: 2px solid #FFFFFF;
-    padding-left: 8px;
-    padding-right: 8px;
+canvas {
+    max-width: 100%;
+    max-height: 100%;
 }
 
-.stack-table-right{
-    padding-left: 8px;
-    padding-right: 8px;
-}
-
-.center-ui-column{
+/* Betting Controls Area */
+.center-ui-column-bottom-row {
+    background: #1e1e1e;
+    padding: 20px;
+    width: 90%;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
     display: flex;
-    flex-direction: column;
-    width: 84%;
+    gap: 15px;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
 }
 
-.center-ui-column-bottom-row{
+/* Input and Error Styling */
+.button-input-wrapper {
     display: flex;
-}
-
-.canvas-wrapper{
-    background-color: transparent;
-}
-
-.canvas{
-    border-radius: 800px;
-}
-
-.ui-wrapper{
-    width: 250px;
-    display:flex;
     flex-direction: column;
-    align-items: center;
-    background-color: rgb(213, 213, 213);
+    gap: 5px;
 }
 
-.summary-message{
-    text-align: center;
-    margin: 6px;
+.raise-input {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background: #2b2b2b;
+    color: white;
+    width: 120px;
 }
 
-.data-table-class table, th, td{
-    border-collapse: collapse;
-    border: 1px solid black;
+.raise-error-message-show {
+    color: #ff6b6b;
+    font-size: 11px;
+    margin: 0;
+    max-width: 120px;
 }
 
-.table-row-server-player{
-    border: thick, solid, green;
-}
-
-.table-row-local-player{
-    font-weight: bold;
-}
-
-.button-input-wrapper{
-    margin: 24px;
-    height: 20px;
-    width: 60%;
-}
-
-.raise-button{
-    background-color: green;
-    border: 1px solid black;
-    width: 100%;
-}
-
-.raise-input{
-    width: 100%;
-}
-
-.raise-button:hover:enabled{
-    background-color: rgb(60, 179, 60);
-    border: 1px solid rgb(227, 220, 88)ca;
-}
-
-.raise-button:disabled{
-    background-color: rgb(208, 219, 208);
-}
-
-.green-button{
-    background-color: green;
-    border: 1px solid black;
-    width: 60%;
-    margin: 24px;
-    height: 20px;
-}
-
-.green-button:hover:enabled{
-    background-color: rgb(60, 179, 60);
-    border: 1px solid rgb(227, 220, 88)ca;
-    width: 60%;
-    margin: 24px;
-    height: 20px;
-}
-
-.green-button:disabled{
-    background-color: rgb(208, 219, 208);
-}
-
-.i-span-club{
-    display: inline-block;
-    background-image: url('./assets/club_icon.png');
-    background-size: .8em;
-    width: .8em;
-    height: .8em;
-}
-.i-span-diamond{
-    display: inline-block;
-    background-image: url('./assets/diamond_icon.png');
-    background-size: .8em;
-    width: .8em;
-    height: .8em;
-}
-.i-span-heart{
-    display: inline-block;
-    background-image: url('./assets/heart_icon.png');
-    background-size: .8em;
-    width: .8em;
-    height: .8em;
-}
-.i-span-spade{
-    display: inline-block;
-    background-image: url('./assets/spade_icon.png');
-    background-size: .8em;
-    width: .8em;
-    height: .8em;
-}
-
-.raise-error-message-show{
-    color: red;
-    background-color: rgb(255, 104, 104);
-    padding: 10px;
-    margin: 0px;
-}
-
-.raise-error-message-hide{
+.raise-error-message-hide {
     display: none;
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: transform 0.1s, background 0.2s;
+}
+
+button:active { transform: scale(0.95); }
+
+.green-button { background-color: #27ae60; color: white; }
+.green-button:hover { background-color: #2ecc71; }
+
+.raise-button { background-color: #8e44ad; color: white; }
+.raise-button:hover { background-color: #9b59b6; }
+
+/* Pot & Stack Displays */
+.stack-wrapper {
+    background: rgba(0,0,0,0.4);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.stack-logo-wrapper img {
+    width: 40px;
+    display: block;
+    margin: 0 auto 5px;
+}
+
+.stack-table-wrapper {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #555;
+    padding-top: 5px;
+}
+
+#pot-total-display, #local-player-stack {
+    font-family: monospace;
+    font-size: 1.2em;
+    color: #f1c40f;
 }

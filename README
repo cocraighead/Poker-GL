@@ -7,6 +7,9 @@ Colin Craighead
 
 
  TODO:
+
+ fix re-add the call button
+ change so the highlighted player icon in the ui is the current player. and switches on a new turn
  -- get better a blender...
 
  fix raise button. It needs to have min raise
