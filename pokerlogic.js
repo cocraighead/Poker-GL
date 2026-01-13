@@ -862,49 +862,71 @@ export function pokerlogic(){
         playerStatsDiv.innerHTML = ''
         // headers
         var properties = [
-            {id:'name',label:'P#'},
-            {id:'total',label:'$stack'},
-            {id:'totalInPot',label:'$inPot'}
+            {id:'icon',label:'',symbol:''},
+            {id:'name',label:'P#',symbol:''},
+            {id:'total',label:'$stack',symbol:'$'},
+            {id:'totalInPot',label:'$inPot',symbol:'$'}
         ]
         // player rows
         for(var i=0;i<gameVar.players.length;i++){
-            if(gameVar.players[i].isIn){
+            if(gameVar.players[i].isIn && !(i===gameVar.localPlayerIndex)){
                 var playerStatDiv = document.createElement('div')
-                playerStatDiv.classList.add('players-row') 
+                playerStatDiv.classList.add('players-row') // player
                 // server player
                 if(i===gameVar.serverPlayerIndex){
                     playerStatDiv.classList.add('table-row-server-player') 
                 }
-                if(i===gameVar.localPlayerIndex){
-                    playerStatDiv.classList.add('table-row-local-player') 
-                }
-                for(var j=0;j<properties.length;j++){
-                    var playerDataPointDiv = document.createElement('div')
+                var playerHeaderDiv = document.createElement('div') // player data point - Header
+                playerHeaderDiv.classList.add('players-row-header')
+                playerStatDiv.append(playerHeaderDiv)
+                var playerOtherStatsWrapperDiv = document.createElement('div') // other stats wrapper
+                playerOtherStatsWrapperDiv.classList.add('players-row-other-stats-wrapper')
+                for(var j=1;j<properties.length;j++){
+                    var playerDataPointDiv = document.createElement('div') // player data point - icon, money, name, see cards
                     playerDataPointDiv.classList.add('players-row-stat') 
-                    playerDataPointDiv.innerHTML = gameVar.players[i][properties[j].id]
+                    if(j==1){
+                        playerDataPointDiv.classList.add('players-row-stat-primary') // first stat is Player's Header
+                    }else{
+                        playerDataPointDiv.classList.add('players-row-stat-secondary') // second stat is Player's Name
+                    }
+                    playerDataPointDiv.innerHTML = properties[j].symbol + gameVar.players[i][properties[j].id]
+                    
                     // dealer
                     if(i===gameVar.dealerIndex && properties[j].id === 'id'){
                         playerDataPointDiv.innerHTML += '<sub>d</sub>'
                     }
-                    playerStatDiv.append(playerDataPointDiv)
+                    playerOtherStatsWrapperDiv.append(playerDataPointDiv)
                 }
+                playerStatDiv.append(playerOtherStatsWrapperDiv)
                 // hand
                 var playerHandDataPointDiv = document.createElement('div')
-                playerHandDataPointDiv.classList.add('players-row-stat') 
                 playerHandDataPointDiv.innerHTML = gameVar.players[i].handToHtmlString()
-                playerStatDiv.append(playerHandDataPointDiv)
+                playerHandDataPointDiv.classList.add('players-row-stat-hand')
+                playerOtherStatsWrapperDiv.append(playerHandDataPointDiv)
                 var playerHandStrengthDataPointDiv = document.createElement('div')
-                playerHandStrengthDataPointDiv.classList.add('players-row-stat') 
+                playerHandStrengthDataPointDiv.classList.add('players-row-stat-hand')
                 if(gameVar.players[i].hand.length){
                     var handStrength = gameVar.getHandStrength(gameVar.players[i].hand,gameVar.board)
                     playerHandStrengthDataPointDiv.innerHTML = handStrength.name
                 }else{
                     playerHandStrengthDataPointDiv.innerHTML = ''
                 }
-                playerStatDiv.append(playerHandStrengthDataPointDiv)
+                playerOtherStatsWrapperDiv.append(playerHandStrengthDataPointDiv)
                 playerStatsDiv.append(playerStatDiv)
             }
         }
+
+        // local player info
+        var myStackChart = document.getElementById('my-stack-chart');
+        myStackChart.innerHTML = ''
+        var localPlayerStack = document.createElement('p')
+        localPlayerStack.innerHTML = '$' + gameVar.players[gameVar.localPlayerIndex].total
+        var localPlayerInPot = document.createElement('p')
+        localPlayerInPot.innerHTML = '$' + gameVar.players[gameVar.localPlayerIndex].totalInPot
+        myStackChart.append(localPlayerStack)
+        myStackChart.append(localPlayerInPot)
+        var myHand = document.getElementById('my-hand');
+        myHand.innerHTML = gameVar.players[gameVar.localPlayerIndex].handToHtmlString()
     }
     /**
      * re-renders summary data on ui like pot total

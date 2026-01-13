@@ -5,6 +5,7 @@ body{
 .main-wrapper{
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .top-ui-row{
@@ -25,6 +26,7 @@ body{
 .flop-wrapper{
     display: flex;
     width: 33%;
+    align-items: center;
 }
 
 .center-ui-row{
@@ -36,7 +38,7 @@ body{
     display: flex;
     flex-direction: column;
     width: 15%;
-    justify-content: end;
+    justify-content: center;
     background-color: #042412;
 }
 
@@ -83,6 +85,7 @@ body{
     display: flex;
     background-color: #031B0E;
     width: 100%;
+    height: 15%;
 }
 
 .canvas-wrapper{
@@ -90,7 +93,7 @@ body{
 }
 
 .canvas{
-    border-radius: 800px;
+    /* border-radius: 800px; */
 }
 
 .ui-wrapper{
@@ -118,16 +121,16 @@ body{
     background-color: #2D6A4F;
     width: 84%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    padding: 5px;
+}
+
+.player-row-group{
+    display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    row-gap: 4px;
-    padding: 10px;
-}
-
-.players-row-stat{
-    color: white;
 }
 
 .table-row-server-player{
@@ -138,49 +141,110 @@ body{
     font-weight: bold;
 }
 
+.table-row-player-wrapper{
+    display: flex;
+}
+
+.players-row-header{
+    display: flex;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    background-color: rgb(193, 223, 233);
+}
+
+.players-row-other-stats-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 12px;
+}
+
+
+.players-row-stat{
+    /* color: white; */
+}
+
+.players-row-stat-primary{
+    font-size: large;
+    color: #e9cd2c;
+    width: 95%;
+}
+
+.players-row-stat-secondary{
+    width: 48%;
+    color: white;
+}
+
+.players-row-stat-hand{
+    width: 98%;
+    color: white;
+}
+
+.players-row-stat-hand p{
+    width: 98%;
+    color: white;
+    font-size: larger;
+    margin: 2px;
+}
+
 .button-input-wrapper{
-    margin: 24px;
-    height: 20px;
-    width: 60%;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    padding: 24px 0px 24px 0px;
 }
 
 .raise-button{
-    background-color: green;
-    border: 1px solid black;
-    width: 100%;
+    background-color: #6A6C2B;
+    color: white;
+    border: 1px solid #535526;
+    width: 48%;
+    height: 50%;
+    font-size: larger;
+    font-weight: 900;
 }
 
 .raise-input{
-    width: 100%;
+    width: 50%;
+    height: 50%;
+    font-size: larger;
 }
 
 .raise-button:hover:enabled{
-    background-color: rgb(60, 179, 60);
-    border: 1px solid rgb(227, 220, 88)ca;
+    background-color: #9ea30f;
 }
 
 .raise-button:disabled{
-    background-color: rgb(208, 219, 208);
+    background-color: rgb(127, 139, 127);
+    color: rgb(165, 165, 165);
+    font-weight: 600;
 }
 
 .green-button{
-    background-color: green;
-    border: 1px solid black;
+    background-color: #6A6C2B;
+    color: white;
+    border: 1px solid #535526;
     width: 60%;
     margin: 24px;
-    height: 20px;
+    height: 50%;
+    font-size: larger;
+    font-weight: 900;
 }
 
 .green-button:hover:enabled{
-    background-color: rgb(60, 179, 60);
-    border: 1px solid rgb(227, 220, 88)ca;
-    width: 60%;
-    margin: 24px;
-    height: 20px;
+    background-color: #9ea30f;
 }
 
 .green-button:disabled{
-    background-color: rgb(208, 219, 208);
+    background-color: rgb(127, 139, 127);
+    color: rgb(165, 165, 165);
+    font-weight: 600;
+}
+
+.my-hand{
+    width: 20%;
+    font-size: larger;
+    color: wheat;
 }
 
 .i-span-club{

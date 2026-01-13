@@ -104,7 +104,7 @@
 <body onresize="canvas.resize();">
    <div id="game-logs-modal"></div>
    <div class="main-wrapper">
-      <div class="top-ui-row">
+      <div id="top-ui-row" class="top-ui-row">
          <div class="top-ui-row-btn-wrapper">
             <div id='open-game-log'>Game Logs</div>
          </div>
@@ -141,20 +141,19 @@
                      <p>Stack</p>
                      <p>Pot</p>
                   </div>
-                  <div class="stack-table-right">
-                     <p>$100</p>
-                     <p>$0</p>
+                  <div id="my-stack-chart" class="stack-table-right">
                   </div>
                </div>
             </div>
          </div>
-         <div class="center-ui-column">
+         <div id="center-ui-column" class="center-ui-column">
             <div class="canvas-wrapper">
                <canvas class="canvas" id="canvas" width="500" height="500"></canvas>
             </div>
-            <div class="center-ui-column-bottom-row">
+            <div id="center-ui-column-bottom-row" class="center-ui-column-bottom-row">
                <button id="fold-button" class="green-button">FOLD</button>
                <button id="check-button" class="green-button">CHECK</button>
+               <div id="my-hand" class="my-hand"></div>
                <button id="call-button" class="green-button">CALL</button>
                <div class="button-input-wrapper">
                   <button id="raise-button" class="raise-button">RAISE</button>

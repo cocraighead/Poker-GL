@@ -112,9 +112,15 @@ function webGLStart(images)
    //  Set canvas
    canvas = document.getElementById("canvas");
    //  Select canvas size
-   var size = Math.min(window.innerWidth,window.innerHeight)-10;
-   canvas.width  = window.innerWidth / 1.48;
-   canvas.height = window.innerHeight / 1.25;
+   var topPad = window.innerHeight * .15
+   var botPad = (window.innerHeight - topPad) * .15
+   var height = window.innerHeight - topPad - botPad;
+
+   var width = document.getElementById("center-ui-column").clientWidth;
+   id="center-ui-column"
+   var size = Math.min(width,height)-10;
+   canvas.width  = width
+   canvas.height = height;
    var xStart = (canvas.width - 2*size) / 2;
    //  Start WebGL
    if (!window.WebGLRenderingContext)
