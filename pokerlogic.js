@@ -868,7 +868,13 @@ export function pokerlogic(){
             {id:'totalInPot',label:'$inPot',symbol:'$'}
         ]
         // player rows
-        for(var i=0;i<gameVar.players.length;i++){
+        var playersLength = gameVar.players.length
+        var playerCounter = 0
+        var dealerIndex = gameVar.dealerIndex
+        var i = ((dealerIndex + 2) % playersLength);
+        while(playerCounter < playersLength){
+            playerCounter += 1
+            i = (i + 1) % playersLength
             if(gameVar.players[i].isIn && !(i===gameVar.localPlayerIndex)){
                 var playerStatDiv = document.createElement('div')
                 playerStatDiv.classList.add('players-row') // player
@@ -885,9 +891,9 @@ export function pokerlogic(){
                     var playerDataPointDiv = document.createElement('div') // player data point - icon, money, name, see cards
                     playerDataPointDiv.classList.add('players-row-stat') 
                     if(j==1){
-                        playerDataPointDiv.classList.add('players-row-stat-primary') // first stat is Player's Header
+                        playerDataPointDiv.classList.add('players-row-stat-primary') // first stat is Player's Name
                     }else{
-                        playerDataPointDiv.classList.add('players-row-stat-secondary') // second stat is Player's Name
+                        playerDataPointDiv.classList.add('players-row-stat-secondary') // second stat is total and pot total
                     }
                     playerDataPointDiv.innerHTML = properties[j].symbol + gameVar.players[i][properties[j].id]
                     
@@ -912,6 +918,23 @@ export function pokerlogic(){
                     playerHandStrengthDataPointDiv.innerHTML = ''
                 }
                 playerOtherStatsWrapperDiv.append(playerHandStrengthDataPointDiv)
+                playerStatsDiv.append(playerStatDiv)
+            }
+            // local player
+            if(gameVar.players[i].isIn && i===gameVar.localPlayerIndex){
+                var playerStatDiv = document.createElement('div')
+                playerStatDiv.classList.add('players-row') // player
+                // local player class
+                if(i===gameVar.serverPlayerIndex){
+                    playerStatDiv.classList.add('table-row-local-player') 
+                }
+                if(i===gameVar.serverPlayerIndex){
+                    playerStatDiv.classList.add('table-row-server-player') 
+                }
+                var playerMsgDiv = document.createElement('div') // local player message
+                playerMsgDiv.classList.add('players-row-stat-primary')
+                playerMsgDiv.innerHTML = 'ME'
+                playerStatDiv.append(playerMsgDiv)
                 playerStatsDiv.append(playerStatDiv)
             }
         }
