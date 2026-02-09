@@ -10,6 +10,7 @@ export class Player  {
         this.total = 100 // $ total
         this.totalInPot = 0 // $ total in pot
         this.firstTurnOnStreet = true // still hasn't had a turn to bet on this street
+        this.showCards = false
     }
     /**
      * hand as a string
@@ -29,8 +30,9 @@ export class Player  {
     handToHtmlString(){
         var handStr = ''
         if(this.hand.length){
-            handStr += this.hand[0].toHtmlString() + ',' + this.hand[1].toHtmlString()
+            handStr += '<div class="hand-card-wrapper">' + this.hand[1].toHtmlString() + '</div>'
+            handStr += '<div class="hand-card-wrapper">' + this.hand[0].toHtmlString() + '</div>'
         }
-        return '<p>' + handStr + '</p>'
+        return '<div class="hand-wrapper">' + handStr + '</div>'
     }
 }

@@ -871,7 +871,7 @@ export function pokerlogic(){
         var playersLength = gameVar.players.length
         var playerCounter = 0
         var dealerIndex = gameVar.dealerIndex
-        var i = ((dealerIndex + 2) % playersLength);
+        var i = ((dealerIndex) % playersLength);
         while(playerCounter < playersLength){
             playerCounter += 1
             i = (i + 1) % playersLength
@@ -905,19 +905,23 @@ export function pokerlogic(){
                 }
                 playerStatDiv.append(playerOtherStatsWrapperDiv)
                 // hand
-                var playerHandDataPointDiv = document.createElement('div')
-                playerHandDataPointDiv.innerHTML = gameVar.players[i].handToHtmlString()
-                playerHandDataPointDiv.classList.add('players-row-stat-hand')
-                playerOtherStatsWrapperDiv.append(playerHandDataPointDiv)
-                var playerHandStrengthDataPointDiv = document.createElement('div')
-                playerHandStrengthDataPointDiv.classList.add('players-row-stat-hand')
-                if(gameVar.players[i].hand.length){
-                    var handStrength = gameVar.getHandStrength(gameVar.players[i].hand,gameVar.board)
-                    playerHandStrengthDataPointDiv.innerHTML = handStrength.name
-                }else{
-                    playerHandStrengthDataPointDiv.innerHTML = ''
+                // don't show hand
+                // temp show the players whose turn it is, so we can go for them locally
+                if(gameVar.players[i].showCards || i===gameVar.serverPlayerIndex){
+                    var playerHandDataPointDiv = document.createElement('div')
+                    playerHandDataPointDiv.innerHTML = gameVar.players[i].handToHtmlString()
+                    playerHandDataPointDiv.classList.add('players-row-stat-hand')
+                    playerOtherStatsWrapperDiv.append(playerHandDataPointDiv)
+                    var playerHandStrengthDataPointDiv = document.createElement('div')
+                    playerHandStrengthDataPointDiv.classList.add('players-row-stat-hand')
+                    if(gameVar.players[i].hand.length){
+                        var handStrength = gameVar.getHandStrength(gameVar.players[i].hand,gameVar.board)
+                        playerHandStrengthDataPointDiv.innerHTML = handStrength.name
+                    }else{
+                        playerHandStrengthDataPointDiv.innerHTML = ''
+                    }
+                    playerOtherStatsWrapperDiv.append(playerHandStrengthDataPointDiv)
                 }
-                playerOtherStatsWrapperDiv.append(playerHandStrengthDataPointDiv)
                 playerStatsDiv.append(playerStatDiv)
             }
             // local player
